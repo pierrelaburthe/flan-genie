@@ -2887,10 +2887,13 @@ body.screen-shake { animation: body-shake 0.45s ease-in-out; }
   background: var(--paper);
   border: 3px solid var(--jaune);
   border-radius: 14px;
-  padding: 28px 30px;
+  padding: 18px 26px;
   text-align: center;
   box-shadow: 8px 8px 0 var(--jaune);
   animation: ch-screen-in 0.5s ease;
+  max-height: 96vh;
+  max-height: 96dvh;
+  overflow: hidden;
 }
 @keyframes ch-screen-in {
   from { opacity: 0; transform: translateY(20px) scale(0.95); }
@@ -2900,21 +2903,21 @@ body.screen-shake { animation: body-shake 0.45s ease-in-out; }
 .ch-screen[hidden] { display: none; }
 
 .ch-screen h2 {
-  margin: 8px 0 14px;
-  font-size: 30px;
+  margin: 4px 0 6px;
+  font-size: 22px;
   font-style: italic;
   color: var(--corail);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.ch-screen p { font-size: 15px; line-height: 1.55; margin: 8px 0; }
-.ch-screen .ch-big { font-size: 19px; font-weight: bold; }
+.ch-screen p { font-size: 14px; line-height: 1.45; margin: 4px 0; }
+.ch-screen .ch-big { font-size: 16px; font-weight: bold; }
 
 .ch-emoji-big {
-  font-size: 80px;
+  font-size: 50px;
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   animation: emoji-pop 0.6s ease;
 }
 .ch-emoji-big.celebrate { animation: emoji-celebrate 1.8s ease infinite; }
@@ -2968,8 +2971,8 @@ body.screen-shake { animation: body-shake 0.45s ease-in-out; }
 
 /* Carte invitation (win / lose) */
 .ch-invite {
-  margin: 18px auto 8px;
-  padding: 18px;
+  margin: 10px auto 4px;
+  padding: 12px 16px;
   background: var(--ink);
   color: var(--paper);
   border-radius: 8px;
