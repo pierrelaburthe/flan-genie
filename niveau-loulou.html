@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Le Flan Pâtissier · La Machine de Loulou</title>
+<link rel="stylesheet" href="style.css?v=6" />
+</head>
+<body class="loulou-body">
+<main class="stage stage-loulou">
+
+  <header class="title-bar">
+    <div class="title-text">
+      <h1>La Machine de Loulou</h1>
+      <h2>Acte I · sc. 5 · arcade</h2>
+    </div>
+    <div class="objective">
+      <span class="label">Mécanique</span>
+      <span class="goal">Maintiens les 4 jauges entre 20 et 80%. Si l'une explose ou s'effondre, fin.</span>
+    </div>
+    <div class="title-controls">
+      <button id="sound-toggle" class="ctrl-btn" title="Couper / activer le son">🔊</button>
+      <a href="index.html" class="ctrl-btn" title="Retour au hub">⌂</a>
+      <button id="restart" class="ctrl-btn" title="Recommencer">↻</button>
+    </div>
+  </header>
+
+  <section class="loulou-score">
+    <div class="ls-block">
+      <div class="ls-lbl">Score</div>
+      <div class="ls-val" id="ls-score">0</div>
+    </div>
+    <div class="ls-block">
+      <div class="ls-lbl">Record</div>
+      <div class="ls-val small" id="ls-high">0</div>
+    </div>
+    <div class="ls-block combo" id="ls-combo-block">
+      <div class="ls-lbl">Multiplicateur</div>
+      <div class="ls-val small" id="ls-combo">×1</div>
+    </div>
+  </section>
+
+  <details class="loulou-help">
+    <summary>Que veulent dire les 4 jauges ? <span class="open-hint">cliquer pour ouvrir</span></summary>
+    <div class="help-grid">
+      <div><span class="help-icon">🎯</span><strong>Aspiration</strong> : ceque la personne veut devenir. Trop haute : illusions. Trop basse : abandon.</div>
+      <div><span class="help-icon">🔨</span><strong>Production</strong> : cequ'elle fait concrètement. Trop haute : burnout. Trop basse : paralysie.</div>
+      <div><span class="help-icon">❤</span><strong>Estime</strong> : cequ'elle pense d'elle-même. Trop haute : narcissisme. Trop basse : effacement.</div>
+      <div><span class="help-icon">🌼</span><strong>Joie</strong> : son humeur de fond. Trop haute : euphorie qui retombe. Trop basse : apathie.</div>
+      <div class="help-rule">Si une jauge atteint <strong>0</strong> ou <strong>100</strong>, la personne quitte la machine et la partie s'arrête. Maintiens entre 35 et 65% pour gagner un multiplicateur de score.</div>
+    </div>
+  </details>
+
+  <section class="loulou-gauges" id="loulou-gauges"></section>
+
+  <section class="loulou-card-area">
+    <div class="loulou-card" id="loulou-card" data-tone="meta">
+      <div class="lc-corner tl"></div>
+      <div class="lc-corner tr"></div>
+      <div class="lc-corner bl"></div>
+      <div class="lc-corner br"></div>
+      <div class="lc-num" id="lc-num">·</div>
+      <div class="lc-header">La Machine de Loulou</div>
+      <div class="lc-avatar" id="lc-avatar">🎰</div>
+      <div class="lc-text" id="lc-text">Appuie sur "Commencer"</div>
+      <div class="lc-speaker" id="lc-speaker">—</div>
+      <div class="lc-tags" id="lc-tags"></div>
+    </div>
+    <button class="loulou-swipe-zone left" id="zone-left" aria-label="Décourager"></button>
+    <button class="loulou-swipe-zone right" id="zone-right" aria-label="Encourager"></button>
+  </section>
+
+  <section class="loulou-actions">
+    <button class="loulou-btn discourage" id="btn-discourage">
+      <span class="loulou-btn-key">←</span>
+      <span class="loulou-btn-sub">"Ce n'est pas pour toi."</span>
+    </button>
+    <button class="loulou-btn encourage" id="btn-encourage">
+      <span class="loulou-btn-sub">"Tu peux le faire."</span>
+      <span class="loulou-btn-key">→</span>
+    </button>
+  </section>
+
+  <div class="palier-banner" id="palier-banner"></div>
+  <div class="danger-frame" id="danger-frame"></div>
+
+  <footer class="meta">Arcade · clic ou flèches du clavier · théorie de Loulou : pour que ça tienne, l'estime doit décroître exponentiellement</footer>
+
+  <div class="defeat-scene" id="defeat-scene">
+    <div class="defeat-emoji" id="defeat-emoji">😶</div>
+    <div class="defeat-label" id="defeat-label"></div>
+    <div class="defeat-glitch"></div>
+    <div class="defeat-flash"></div>
+  </div>
+
+  <div class="loulou-overlay" id="overlay">
+    <div class="lo-card">
+      <div class="lo-title" id="lo-title">Loulou · La Machine</div>
+      <div class="lo-sub" id="lo-sub">Tu joues Loulou, ex-banquier reconverti inventeur. Tu testes ta machine sur les passants. Maintiens leur équilibre psychique.</div>
+      <button class="loulou-btn encourage start" id="lo-start">Commencer</button>
+    </div>
+  </div>
+</main>
+<script src="js/audio.js?v=6"></script>
+<script src="js/save.js?v=6"></script>
+<script src="js/loulou.js?v=6"></script>
+</body>
+</html>

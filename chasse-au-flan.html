@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>La Chasse au Flan — Avignon</title>
+<link rel="stylesheet" href="style.css?v=7" />
+</head>
+<body class="chasse-body">
+<main class="stage stage-chasse">
+
+  <header class="chasse-title">
+    <div class="ct-line1">La Chasse au Flan</div>
+    <div class="ct-line2">Avignon · Festival 2026</div>
+  </header>
+
+  <section class="chasse-hud">
+    <div class="ch-block">
+      <span class="ch-lbl">Manche</span>
+      <span class="ch-val"><span id="ch-round">1</span> / 12</span>
+    </div>
+    <div class="ch-block big timer" id="ch-timer-block">
+      <span class="ch-lbl">Temps</span>
+      <span class="ch-val timer-val"><span id="ch-time">—</span><span class="unit">s</span></span>
+    </div>
+    <div class="ch-block ch-restart-block">
+      <button id="restart-btn" class="audio-btn restart-btn-ingame" title="Recommencer la partie" aria-label="Recommencer">
+        <span class="audio-icon">↻</span>
+        <span class="audio-lbl">Recommencer</span>
+      </button>
+      <button id="mode-btn" class="audio-btn mode-btn-ingame" title="Changer la difficulté" aria-label="Changer la difficulté">
+        <span class="audio-icon">🎚</span>
+        <span class="audio-lbl">Difficulté</span>
+      </button>
+    </div>
+    <div class="ch-block ch-audio-block">
+      <button id="ambience-toggle" class="audio-btn" title="Couper la musique d'ambiance" aria-label="Musique d'ambiance">
+        <span class="audio-icon">🎵</span>
+        <span class="audio-lbl">Ambiance</span>
+      </button>
+      <button id="sfx-toggle" class="audio-btn" title="Couper les bruitages" aria-label="Bruitages">
+        <span class="audio-icon">🐔</span>
+        <span class="audio-lbl">Bruitages</span>
+      </button>
+    </div>
+    <div class="ch-block ch-home-block">
+      <a href="index.html" class="audio-btn home-btn" title="Retour au hub" aria-label="Hub">
+        <span class="audio-icon">⌂</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="chasse-grid-wrap">
+    <div class="chasse-grid" id="ch-grid"></div>
+  </section>
+
+  <div class="ch-transition" id="ch-transition"></div>
+
+  <div class="ch-overlay" id="ch-overlay">
+    <!-- INTRO -->
+    <div class="ch-screen" id="ch-intro">
+      <div class="ch-emoji-big">🐔🍮🐔</div>
+      <h2>La Chasse au Flan</h2>
+      <p class="ch-lead-short">Trouve le <strong>🍮</strong> dans la foule. <strong>12 manches</strong>. Évite les imitateurs.</p>
+      <div class="mode-picker">
+        <h3 class="mp-title">Choisis ton mode</h3>
+        <div class="mode-cards">
+          <button class="mode-card mc-beginner" data-mode="beginner">
+            <div class="mc-icon">🌿</div>
+            <div class="mc-info">
+              <div class="mc-label">Débuflan</div>
+              <div class="mc-sub">Tout doux. Pour débuter.</div>
+            </div>
+          </button>
+          <button class="mode-card mc-medium" data-mode="medium">
+            <div class="mc-icon">🍮</div>
+            <div class="mc-info">
+              <div class="mc-label">Mi-flan</div>
+              <div class="mc-sub">Un cran au-dessus.</div>
+            </div>
+          </button>
+          <button class="mode-card mc-hardcore" data-mode="hardcore">
+            <div class="mc-icon">🔥</div>
+            <div class="mc-info">
+              <div class="mc-label">Hardcôt</div>
+              <div class="mc-sub">Trop dur pour la plupart.</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIN -->
+    <div class="ch-screen" id="ch-win" hidden>
+      <div class="ch-emoji-big celebrate">🍮✨</div>
+      <h2>Bravo !</h2>
+      <p class="ch-big">Tu as trouvé le flan.</p>
+      <div class="ch-invite">
+        <div class="invite-line1">Tu as gagné le droit de venir</div>
+        <div class="invite-title">LE FLAN PÂTISSIER</div>
+        <div class="invite-meta">
+          <span class="invite-author">d'Etienne Bennequin · Cie de la Toque Flamboyante<br></span>
+          <strong>Aujourd'hui à 15 h 30</strong><br>
+          Théâtre du Tremplin, Avignon
+        </div>
+        <div class="invite-hint">
+          Place <strong>payante</strong>, comme tout le monde. On n'a pas les moyens, désolé.<br>
+          Mais on est très contents que tu viennes.
+        </div>
+      </div>
+      <div class="mode-picker">
+        <h3 class="mp-title">Rejouer dans un mode</h3>
+        <div class="mode-cards">
+          <button class="mode-card mc-beginner" data-mode="beginner" data-from="win">
+            <div class="mc-icon">🌿</div>
+            <div class="mc-info"><div class="mc-label">Débuflan</div></div>
+          </button>
+          <button class="mode-card mc-medium" data-mode="medium" data-from="win">
+            <div class="mc-icon">🍮</div>
+            <div class="mc-info"><div class="mc-label">Mi-flan</div></div>
+          </button>
+          <button class="mode-card mc-hardcore" data-mode="hardcore" data-from="win">
+            <div class="mc-icon">🔥</div>
+            <div class="mc-info"><div class="mc-label">Hardcôt</div></div>
+          </button>
+        </div>
+      </div>
+      <div class="ch-actions">
+        <a href="index.html" class="ch-btn">Hub</a>
+      </div>
+    </div>
+
+    <!-- LOSE -->
+    <div class="ch-screen" id="ch-lose" hidden>
+      <div class="ch-emoji-big sad" id="ch-lose-emoji">😶</div>
+      <h2 id="ch-lose-title">Loupé.</h2>
+      <p class="ch-big" id="ch-lose-msg">Tu as raté le flan, mais le flan ne t'a pas raté.</p>
+      <div class="ch-invite consolation">
+        <div class="invite-line1">Tu peux quand même venir</div>
+        <div class="invite-title">LE FLAN PÂTISSIER</div>
+        <div class="invite-meta">
+          <strong>Aujourd'hui à 15 h 30</strong><br>
+          Théâtre du Tremplin, Avignon
+        </div>
+        <div class="invite-hint">
+          Place <strong>payante</strong> aussi (on n'a pas les moyens).<br>
+          Mais à la fin, une <strong>part de flan t'attend</strong>. Tu as perdu et c'est ça la récompense.
+        </div>
+      </div>
+      <div class="mode-picker">
+        <h3 class="mp-title">Essayer encore dans un mode</h3>
+        <div class="mode-cards">
+          <button class="mode-card mc-beginner" data-mode="beginner" data-from="lose">
+            <div class="mc-icon">🌿</div>
+            <div class="mc-info"><div class="mc-label">Débuflan</div></div>
+          </button>
+          <button class="mode-card mc-medium" data-mode="medium" data-from="lose">
+            <div class="mc-icon">🍮</div>
+            <div class="mc-info"><div class="mc-label">Mi-flan</div></div>
+          </button>
+          <button class="mode-card mc-hardcore" data-mode="hardcore" data-from="lose">
+            <div class="mc-icon">🔥</div>
+            <div class="mc-info"><div class="mc-label">Hardcôt</div></div>
+          </button>
+        </div>
+      </div>
+      <div class="ch-actions">
+        <a href="index.html" class="ch-btn">Hub</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+<script src="js/audio.js?v=7"></script>
+<script src="js/chasse.js?v=7"></script>
+</body>
+</html>

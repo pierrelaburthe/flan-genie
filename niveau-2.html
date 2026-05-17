@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Le Flan Pâtissier · Niveau 2 : Le Flan Anonyme</title>
+<link rel="stylesheet" href="style.css?v=5" />
+</head>
+<body>
+<main class="stage stage-n2">
+
+  <header class="title-bar">
+    <div class="title-text">
+      <h1>Le Flan Pâtissier</h1>
+      <h2>Niveau 2 · Le Flan Anonyme</h2>
+    </div>
+    <div class="objective">
+      <span class="label">Situation</span>
+      <span class="goal">Un flan anonyme. Un copain qui dort. Une coloc qui regarde. Que fais-tu ?</span>
+    </div>
+    <div class="title-controls">
+      <button id="sound-toggle" class="ctrl-btn" title="Couper / activer le son">🔊</button>
+      <button id="voice-toggle" class="ctrl-btn" title="Couper / activer la voix de l'Oracle">🗣</button>
+      <a href="index.html" class="ctrl-btn" title="Retour au hub">⌂</a>
+      <button id="restart" class="ctrl-btn" title="Recommencer le niveau">↻</button>
+    </div>
+  </header>
+
+  <section class="you-play">
+    <div class="avatar">🧑</div>
+    <div>
+      <div class="who">Tu joues Œugénie · 27 ans · malheureuse depuis ses 12 ans</div>
+      <div class="desc">Ton copain Jean-Nathan dort sur le canapé. Sa coloc Laure-Yann te regarde. Un flan anonyme vient d'être livré. Cinq tours, sept fins possibles, pas de bonne réponse, juste un chemin que tu traces.</div>
+    </div>
+  </section>
+
+  <section class="hud" aria-label="Indicateurs">
+    <div class="gauge" data-tip="Ce que tu te permets de ressentir. Sous 5%, tu ne peux plus parler.">
+      <span class="gauge-label">Estime de soi <span class="hint">i</span></span>
+      <div class="bar"><div class="fill estime" id="fill-estime"></div></div>
+      <span class="value" id="val-estime">35%</span>
+    </div>
+    <div class="gauge" data-tip="À 70%, Jean-Nathan se réveille en sursaut et te surprend. Défaite.">
+      <span class="gauge-label">Tension dans la pièce <span class="hint">i</span></span>
+      <div class="bar"><div class="fill suspect" id="fill-suspicion"></div></div>
+      <span class="value" id="val-suspicion">0%</span>
+    </div>
+    <div class="gauge" data-tip="Tu commences avec deux flans. Chaque bouchée en consomme un.">
+      <span class="gauge-label">Flans restants <span class="hint">i</span></span>
+      <div class="dots" id="dots-charge"></div>
+    </div>
+  </section>
+
+  <section class="scene-area">
+    <div class="backdrop apartment" id="backdrop">
+      <div class="cave"></div>
+      <div class="tour-badge" id="tour-badge">Intro</div>
+      <div class="bell-warn" id="bell-warn"></div>
+
+      <div class="prop autel" id="autel" data-name="Le flan">📦</div>
+      <div class="prop marmite" id="marmite">🛋️</div>
+
+      <div class="char genie" id="genie" data-name="Jean-Nathan (dort)">😴</div>
+      <div class="char oeugenie is-player" id="oeugenie" data-name="Toi · Œugénie">🧑</div>
+      <div class="char machine" id="machine" data-name="Laure-Yann">💅</div>
+      <div class="char cloche" id="cloche">🛎</div>
+      <div class="tricot-progress" id="tricot-progress"></div>
+    </div>
+  </section>
+
+  <section class="dialogue-wrap">
+    <div class="dialogue" id="dialogue" aria-live="polite"></div>
+    <div class="skip-hint" id="skip-hint">Clique pour accélérer</div>
+  </section>
+
+  <section class="choices-area">
+    <div class="legend">
+      <span class="leg-item"><span class="tag doux">Doux</span> protège les autres</span>
+      <span class="leg-item"><span class="tag cruel">Cruel</span> assume ton désir</span>
+      <span class="leg-item"><span class="tag neutre">Neutre</span> reporte la décision</span>
+      <span class="leg-item"><span class="tag coloc">Coloc</span> impliquer Laure-Yann</span>
+    </div>
+    <div class="choices" id="choices"></div>
+  </section>
+
+  <footer class="meta">Niveau 2 · Le Flan Anonyme · 5 tours · 4 fins</footer>
+</main>
+<script src="js/audio.js?v=5"></script>
+<script src="js/save.js?v=5"></script>
+<script src="js/oracle-voice.js?v=5"></script>
+<script src="js/engine.js?v=5"></script>
+<script src="js/n2.js?v=5"></script>
+</body>
+</html>
