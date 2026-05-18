@@ -336,32 +336,14 @@ function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 function pickFlanIdx(cols, rows) {
   const cells = cols * rows;
-  let bestPos = -1;
-  let bestScore = -1;
-  // Échantillonne 20 positions, garde celle la plus loin des positions récentes
-  // et qui évite le coin haut-gauche.
-  for (let i = 0; i < 25; i++) {
-    const p = Math.floor(Math.random() * cells);
-    const row = Math.floor(p / cols);
-    const col = p % cols;
-    // Évite systématiquement les 2 coins du haut (anti "haut-gauche")
-    if (row === 0 && col <= 1) continue;
-    if (row === 0 && col >= cols - 2) continue;
-    // Distance min aux 3 derniers flans
-    let minDist = 999;
-    for (const rf of recentFlan) {
-      const d = Math.abs(rf.row - row) + Math.abs(rf.col - col);
-      if (d < minDist) minDist = d;
-    }
-    if (recentFlan.length === 0) minDist = 5;
-    if (minDist > bestScore) { bestScore = minDist; bestPos = p; }
-  }
-  if (bestPos < 0) bestPos = Math.floor(Math.random() * cells);
-  const row = Math.floor(bestPos / cols);
-  const col = bestPos % cols;
-  recentFlan.push({ row, col });
-  if (recentFlan.length > 4) recentFlan.shift();
-  return bestPos;
+  const lastPos = recentFlan.length > 0 ? recentFlan[recentFlan.length - 1].pos : -1;
+  let pos;
+  do {
+    pos = Math.floor(Math.random() * cells);
+  } while (pos === lastPos);
+  recentFlan.length = 0;
+  recentFlan.push({ pos, row: Math.floor(pos / cols), col: pos % cols });
+  return pos;
 }
 
 // Ajuste les dimensions de la grille selon la largeur d'écran
