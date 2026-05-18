@@ -573,17 +573,16 @@ const AudioFX = (() => {
   function isSfxMuted() { return sfxMuted; }
 
   // ---------- Soundtrack 8-bit en boucle ----------
-  // Un seul AudioBuffer contient mélodie + harmonie + basse + percus + pause.
   // AudioBufferSourceNode loop=true : aucun timer JS, aucune automation de gain.
   let _musicSource = null;
   let _melodyAudioBuf = null; // rebuilt if null
 
-  // 1 unité = noire à 175 BPM (0.343 s)
-  const BEAT_8BIT = 0.343;
-  // Articulation mélodie : 55 % son, 45 % silence
+  // 168 BPM = 0.357 s/noire — tempo funky groove
+  const BEAT_8BIT = 0.357;
   const ARTICULATION = 0.55;
-  // Respiration entre boucles : 1 noire
   const LOOP_PAUSE_BEATS = 1;
+  // Swing shuffle 2:1 : croche longue = 2/3 de noire
+  const SWING = 2 / 3;
 
   const MELODY_8BIT = [
     { f: 493.88, len: 1   }, // B4
@@ -601,13 +600,12 @@ const AudioFX = (() => {
     { f: 392.00, len: 1   }, // G4
   ];
 
-  // Harmony : tierce majeure au-dessus de chaque note de mélodie
   const HARMONY_8BIT = [
-    { f: 622.25, len: 1   }, // D#5 / Eb5  (+m3 de B4)
-    { f: 493.88, len: 1.5 }, // B4         (+M3 de G4)
+    { f: 622.25, len: 1   }, // Eb5
+    { f: 493.88, len: 1.5 }, // B4
     { f: 622.25, len: 0.5 }, // Eb5
-    { f: 554.37, len: 0.5 }, // C#5        (+M3 de A4)
-    { f: 739.99, len: 0.5 }, // F#5        (+M3 de D5)
+    { f: 554.37, len: 0.5 }, // C#5
+    { f: 739.99, len: 0.5 }, // F#5
     { f: 622.25, len: 0.5 }, // Eb5
     { f: 493.88, len: 0.5 }, // B4
     { f: 622.25, len: 1   }, // Eb5
@@ -618,21 +616,26 @@ const AudioFX = (() => {
     { f: 493.88, len: 1   }, // B4
   ];
 
-  // Bass : 1 octave sous la mélodie, notes courtes
+  // Basse syncopée avec notes de passage et ghost-notes
   const BASS_8BIT = [
-    { f: 246.94, start: 0,    len: 0.6  }, // B3
-    { f: 196.00, start: 1,    len: 0.9  }, // G3
-    { f: 246.94, start: 2.5,  len: 0.3  }, // B3
-    { f: 220.00, start: 3,    len: 0.3  }, // A3
-    { f: 293.66, start: 3.5,  len: 0.3  }, // D4
-    { f: 246.94, start: 4,    len: 0.3  }, // B3
-    { f: 196.00, start: 4.5,  len: 0.3  }, // G3
-    { f: 246.94, start: 5,    len: 0.6  }, // B3
-    { f: 196.00, start: 6,    len: 0.9  }, // G3
-    { f: 246.94, start: 7.5,  len: 0.3  }, // B3
-    { f: 220.00, start: 8,    len: 0.3  }, // A3
-    { f: 293.66, start: 8.5,  len: 0.3  }, // D4
-    { f: 196.00, start: 9,    len: 0.6  }, // G3
+    { f: 246.94, start: 0,    len: 0.30 }, // B3 — pied
+    { f: 196.00, start: 0.67, len: 0.28 }, // G3 — anticipation swinguée
+    { f: 196.00, start: 1,    len: 0.55 }, // G3
+    { f: 220.00, start: 1.85, len: 0.20 }, // A3 — note de passage
+    { f: 246.94, start: 2.5,  len: 0.30 }, // B3
+    { f: 220.00, start: 3,    len: 0.28 }, // A3
+    { f: 293.66, start: 3.67, len: 0.28 }, // D4 — off-beat funky
+    { f: 246.94, start: 4,    len: 0.30 }, // B3
+    { f: 196.00, start: 4.5,  len: 0.22 }, // G3 ghost
+    { f: 246.94, start: 5,    len: 0.30 }, // B3
+    { f: 196.00, start: 5.67, len: 0.28 }, // G3
+    { f: 196.00, start: 6,    len: 0.55 }, // G3
+    { f: 220.00, start: 6.85, len: 0.20 }, // A3 passage
+    { f: 246.94, start: 7.5,  len: 0.30 }, // B3
+    { f: 220.00, start: 8,    len: 0.28 }, // A3
+    { f: 293.66, start: 8.67, len: 0.28 }, // D4
+    { f: 196.00, start: 9,    len: 0.55 }, // G3
+    { f: 246.94, start: 9.67, len: 0.22 }, // B3 — turnaround avant rebouclage
   ];
 
   function _writeTriangle(data, pos, freq, sr, samples, volume, articulation) {
@@ -649,35 +652,57 @@ const AudioFX = (() => {
     }
   }
 
-  // Kick : sine très courte qui descend rapidement
   function _writeKick(data, samplePos, sr, totalSamples, vol) {
     const dur = Math.round(sr * 0.10);
     if (samplePos + dur > totalSamples) return;
     for (let i = 0; i < dur; i++) {
       const t = i / sr;
-      const freq = 180 * Math.exp(-25 * t);
-      const phase = 2 * Math.PI * freq * t;
-      const env = Math.exp(-18 * t);
-      data[samplePos + i] += vol * Math.sin(phase) * env;
+      data[samplePos + i] += vol * Math.sin(2 * Math.PI * 180 * Math.exp(-25 * t) * t) * Math.exp(-18 * t);
     }
   }
 
-  // Hi-hat : bruit blanc très court, filtré aigu
+  function _writeSnare(data, samplePos, sr, totalSamples, vol) {
+    const dur = Math.round(sr * 0.08);
+    if (samplePos + dur > totalSamples) return;
+    let seed = 0x9e3779b9;
+    for (let i = 0; i < dur; i++) {
+      seed = Math.imul(seed ^ (seed >>> 16), 0x45d9f3b);
+      seed ^= seed >>> 16;
+      const noise = (seed & 0xffff) / 32768.0 - 1.0;
+      const body  = Math.sin(2 * Math.PI * 185 * i / sr);
+      const env   = Math.exp(-38 * i / sr);
+      data[samplePos + i] += vol * (noise * 0.65 + body * 0.35) * env;
+    }
+  }
+
   function _writeHihat(data, samplePos, sr, totalSamples, vol) {
     const dur = Math.round(sr * 0.028);
     if (samplePos + dur > totalSamples) return;
     for (let i = 0; i < dur; i++) {
-      const env = 1 - i / dur;
-      // pseudo-bruit via harmoniques hautes fréquences
       const t = i / sr;
       const v = (Math.sin(2 * Math.PI * 8000 * t) + Math.sin(2 * Math.PI * 11200 * t)) * 0.5;
-      data[samplePos + i] += vol * v * env;
+      data[samplePos + i] += vol * v * (1 - i / dur);
+    }
+  }
+
+  // Stab accord court (triangle, two-note chord) — énergie funky sur l'anticipation
+  function _writeChordStab(data, samplePos, sr, totalSamples, freqs, vol) {
+    const dur = Math.round(sr * 0.045);
+    if (samplePos + dur > totalSamples) return;
+    for (let i = 0; i < dur; i++) {
+      const env = Math.exp(-50 * i / sr);
+      let v = 0;
+      for (const f of freqs) {
+        const phase = (i % (sr / f)) / (sr / f);
+        v += 1 - 4 * Math.abs(phase - 0.5);
+      }
+      data[samplePos + i] += vol * (v / freqs.length) * env;
     }
   }
 
   function _buildMelodyAudioBuffer(c) {
     const sr = c.sampleRate;
-    const melodyBeats  = MELODY_8BIT.reduce((s, n) => s + n.len, 0);
+    const melodyBeats  = MELODY_8BIT.reduce((s, n) => s + n.len, 0); // = 10
     const totalBeats   = melodyBeats + LOOP_PAUSE_BEATS;
     const totalSamples = Math.round(totalBeats * BEAT_8BIT * sr);
 
@@ -692,7 +717,7 @@ const AudioFX = (() => {
       pos += slotSamples;
     }
 
-    // --- Harmonie (même rythme, volume plus doux) ---
+    // --- Harmonie ---
     pos = 0;
     for (const note of HARMONY_8BIT) {
       const slotSamples = Math.round(note.len * BEAT_8BIT * sr);
@@ -709,26 +734,39 @@ const AudioFX = (() => {
       const period  = sr / bn.f;
       for (let i = 0; i < bSamples; i++) {
         const phase = (i % period) / period;
-        const v = 0.09 * Math.sin(2 * Math.PI * phase);
         let env = 1;
         if (i < fadeLen) env = i / fadeLen;
         else if (i >= bSamples - fadeLen) env = (bSamples - 1 - i) / fadeLen;
-        data[bStart + i] += v * env;
+        data[bStart + i] += 0.09 * Math.sin(2 * Math.PI * phase) * env;
       }
     }
 
-    // --- Percussions : kick sur les temps forts, hi-hat en doubles croches ---
-    // Grille en croches (0.5 beat) sur toute la durée mélodie
-    const halfBeat = BEAT_8BIT * 0.5;
-    const numEighths = Math.floor(melodyBeats / 0.5);
-    for (let i = 0; i < numEighths; i++) {
-      const t = Math.round(i * halfBeat * sr);
-      const beat = i * 0.5; // position en beats
-      // Kick : sur chaque noire (0, 1, 2, …)
-      if (i % 2 === 0) _writeKick(data, t, sr, totalSamples, 0.18);
-      // Hi-hat : sur chaque croche
-      _writeHihat(data, t, sr, totalSamples, 0.06);
+    // --- Percussions avec swing shuffle 2:1 ---
+    // Sur chaque noire : kick (pairs) ou snare (impairs) + hi-hat downbeat
+    // Sur chaque swung upbeat (SWING * BEAT) : hi-hat léger
+    const numBeats = Math.floor(melodyBeats); // 10
+    for (let b = 0; b < numBeats; b++) {
+      const downSample = Math.round(b * BEAT_8BIT * sr);
+      const upSample   = Math.round((b + SWING) * BEAT_8BIT * sr);
+      if (b % 2 === 0) _writeKick  (data, downSample, sr, totalSamples, 0.20);
+      else             _writeSnare (data, downSample, sr, totalSamples, 0.15);
+      _writeHihat(data, downSample, sr, totalSamples, 0.07);
+      _writeHihat(data, upSample,   sr, totalSamples, 0.04);
     }
+
+    // --- Chord stabs sur les swung upbeats des kicks (beats 0,2,4,6,8) ---
+    // Effet "chicken scratch" — énergie syncopée juste avant le snare
+    const stabChords = [
+      [493.88, 622.25], // B4+Eb5
+      [440.00, 554.37], // A4+C#5
+      [493.88, 587.33], // B4+D5
+      [392.00, 493.88], // G4+B4
+      [493.88, 622.25], // B4+Eb5
+    ];
+    [0, 2, 4, 6, 8].forEach((b, i) => {
+      const sp = Math.round((b + SWING) * BEAT_8BIT * sr);
+      if (sp < totalSamples) _writeChordStab(data, sp, sr, totalSamples, stabChords[i], 0.07);
+    });
 
     return audioBuf;
   }
