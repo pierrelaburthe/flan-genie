@@ -3,7 +3,8 @@
 // Trouve le 🍮 caché dans la foule en 3 manches qui durcissent.
 // ============================================================
 
-const FLAN = "🍮";
+const W = window.WORDINGS;
+const FLAN = W.symbols.flan;
 
 // Pools d'emojis Festival d'Avignon, par proximité visuelle avec le flan
 // (du plus différent au plus ressemblant)
@@ -26,8 +27,8 @@ const TRAPS_HARD = ["🍯", "🥮", "🍩", "🎂", "🧁", "🍰"];
 // 3 modes de difficulté
 const MODES = {
   beginner: {
-    label: "Débuflan",
-    sub: "Tout doux. Pour débuter.",
+    label: W.modes.beginner.label,
+    sub: W.modes.beginner.sub,
     timeMult: 1.7,
     chickenMult: 1.8,
     featherMult: 1.8,
@@ -40,8 +41,8 @@ const MODES = {
     roosterMult: 0.3,
   },
   medium: {
-    label: "Mi-flan",
-    sub: "Le défi classique, un cran plus dur.",
+    label: W.modes.medium.label,
+    sub: W.modes.medium.sub,
     timeMult: 0.92,
     chickenMult: 0.85,
     featherMult: 0.88,
@@ -54,8 +55,8 @@ const MODES = {
     roosterMult: 1.1,
   },
   hardcore: {
-    label: "Hardcôt",
-    sub: "Trop dur pour la plupart des humains.",
+    label: W.modes.hardcore.label,
+    sub: W.modes.hardcore.sub,
     timeMult: 0.78,
     chickenMult: 0.65,
     featherMult: 0.65,
@@ -173,7 +174,7 @@ let ROUNDS = ROUNDS_BASE; // recalculé via applyMode()
 // ============================================================
 // Sauvegarde de progression + médailles
 // ============================================================
-const SAVE_KEY = "flan-chasse-progress";
+const SAVE_KEY = W.storage.saveKey;
 
 function loadProgress() {
   try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "{}"); }
@@ -234,7 +235,7 @@ function updateModeBadges() {
     if (time) {
       const t = document.createElement("div");
       t.className = "mc-record";
-      t.textContent = "Record " + formatTime(time);
+      t.textContent = W.records.label + formatTime(time);
       card.appendChild(t);
     }
   });
@@ -263,29 +264,10 @@ function applyMode(modeName) {
 }
 
 // Bulles de texte qui flashent aléatoirement
-const BUBBLES = [
-  "Hé !", "Là-bas !", "Non, ici", "Trop tard", "COT COT", "Pas moi",
-  "Cherche bien", "🍮 →", "← 🍮", "↑ 🍮", "Plus vite", "Oups",
-  "Encore moi", "Ouvre l'œil", "Boum", "Hop hop hop", "Y'a un piège",
-  "Pas celui-là", "Mais non !", "Là, là, là !", "Vite vite", "Tu chauffes",
-  "Brûlant", "Froid", "Tu rêves", "Cocoricot", "Aïe", "Caquète",
-];
+const BUBBLES = W.bubbles;
 
 // Présentation de chaque manche avant le round (12 manches, 2 par génie)
-const GENIE_INTROS = [
-  { emoji: "🐔",          title: "Le premier génie",   subtitle: "Il est gentil. Tu vas voir." },
-  { emoji: "🐔",          title: "Le premier génie",   subtitle: "Voilà sa poule." },
-  { emoji: "🐔🐔",         title: "Le deuxième génie",  subtitle: "Foule plus dense." },
-  { emoji: "🐔🐔",         title: "Le deuxième génie",  subtitle: "Et un imitateur." },
-  { emoji: "🐔🐔🐔",        title: "Le troisième génie", subtitle: "Plumes et bulles." },
-  { emoji: "🐔🐔🐔",        title: "Le troisième génie", subtitle: "Les emojis mutent." },
-  { emoji: "🐔🐔🐔🐔",       title: "Le quatrième génie", subtitle: "Tout ressemble au flan." },
-  { emoji: "🐔🐔🐔🐔",       title: "Le quatrième génie", subtitle: "Et des œufs te tombent dessus." },
-  { emoji: "🐔🐔🐔🐔🐔",      title: "Le cinquième génie", subtitle: "Les emojis permutent." },
-  { emoji: "🐔🐔🐔🐔🐔",      title: "Le cinquième génie", subtitle: "Plus vite, plus dur." },
-  { emoji: "🐔🐔🐔🐔🐔🐔",     title: "Le sixième génie",   subtitle: "Le dernier. Bonne chance." },
-  { emoji: "🐔🐔🐔🐔🐔🐔",     title: "Le sixième génie",   subtitle: "Cocorico final." },
-];
+const GENIE_INTROS = W.genieIntros;
 
 const state = {
   round: 0,
@@ -720,7 +702,7 @@ function spawnBubble() {
 function spawnGiantRooster() {
   const r = document.createElement("div");
   r.className = "wildlife giant-rooster";
-  r.innerHTML = `<div class="gr-cock">🐓</div><div class="gr-text">COCORICO !!</div>`;
+  r.innerHTML = `<div class="gr-cock">🐓</div><div class="gr-text">${W.effects.giantRoosterText}</div>`;
   document.body.appendChild(r);
   AudioFX.flap(0.12);
   setTimeout(() => AudioFX.cocorico(0.20), 80);
@@ -933,7 +915,7 @@ function onCellClick(btn, isFlan, isTricky) {
     AudioFX.clucksExcited(0.22);
     setTimeout(() => AudioFX.flap(0.08), 380);
     btn.classList.add("found");
-    showReaction("Bravo !", "green");
+    showReaction(W.reactions.bravo, "green");
     state.playing = false;
     state.inTransition = true; // garde la musique et le cœur actifs
     clearInterval(state.timerId);
@@ -945,7 +927,7 @@ function onCellClick(btn, isFlan, isTricky) {
   } else {
     AudioFX.thud();
     btn.classList.add("wrong");
-    showReaction("Raté !", "red");
+    showReaction(W.reactions.miss, "red");
     shakeScreen();
     // En manche 3, cliquer sur un imitateur = défaite directe
     if (isTricky) {
@@ -1007,7 +989,7 @@ function updateTimer() {
   // "VITE !" qui flashe une fois sous 2 secondes
   if (state.timeLeft <= 2 && state.timeLeft > 0 && !state.viteShown && state.playing) {
     state.viteShown = true;
-    showReaction("Vite !", "orange");
+    showReaction(W.reactions.hurry, "orange");
   }
   // Met à jour l'intensité visuelle (fond + tremblements)
   updateIntensity();
@@ -1041,10 +1023,10 @@ function showFirstRoundInstruction() {
   const transEl = document.getElementById("ch-transition");
   if (!transEl) return;
   transEl.innerHTML = `
-    <div class="trans-genies">🍮</div>
-    <div class="trans-title">Trouve le flan</div>
-    <div class="trans-subtitle">Clique-le dès que tu le vois.</div>
-    <div class="trans-meta">Manche 1 / ${TOTAL_ROUNDS}</div>
+    <div class="trans-genies">${W.symbols.flan}</div>
+    <div class="trans-title">${W.transition.findFlanTitle}</div>
+    <div class="trans-subtitle">${W.transition.findFlanSubtitle}</div>
+    <div class="trans-meta">${W.transition.roundLabel} 1 / ${TOTAL_ROUNDS}</div>
   `;
   transEl.classList.add("show");
   AudioFX.pop(0.13, 660);
@@ -1066,7 +1048,7 @@ function showRoundTransition(nextIdx, cb) {
       <div class="trans-genies">${intro.emoji}</div>
       <div class="trans-title">${intro.title}</div>
       <div class="trans-subtitle">${intro.subtitle || ""}</div>
-      <div class="trans-meta">Manche ${nextIdx + 1} / ${TOTAL_ROUNDS}</div>
+      <div class="trans-meta">${W.transition.roundLabel} ${nextIdx + 1} / ${TOTAL_ROUNDS}</div>
     `;
     transEl.classList.add("show");
     AudioFX.pop(0.13, 740);
@@ -1084,7 +1066,7 @@ function showRoundTransition(nextIdx, cb) {
 function generateCode() {
   const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
   const digits = "23456789";
-  let s = "FLAN-";
+  let s = W.code.prefix;
   for (let i = 0; i < 4; i++) s += letters[Math.floor(Math.random() * letters.length)];
   s += "-";
   for (let i = 0; i < 2; i++) s += digits[Math.floor(Math.random() * digits.length)];
@@ -1127,8 +1109,8 @@ function injectVictoryStats() {
   const medal = getMedalForMode(state.mode, loadProgress());
   const time = state.lastGameTime ? formatTime(state.lastGameTime) : "?";
   stats.innerHTML = `
-    ${state.isNewRecord ? '<div class="vs-record">✨ Nouveau record !</div>' : ''}
-    <div class="vs-row"><span>Ton temps</span><strong>${time}</strong></div>
+    ${state.isNewRecord ? '<div class="vs-record">' + W.win.newRecord + '</div>' : ''}
+    <div class="vs-row"><span>${W.win.yourTime}</span><strong>${time}</strong></div>
     ${medal ? '<div class="vs-medal">' + medal + '</div>' : ''}
   `;
   const lead = winScreen.querySelector(".ch-big");
@@ -1149,16 +1131,16 @@ function loseGame(reason, clickedEmoji) {
   AudioFX.loseMusic();
   if (reason === "tricky") {
     loseEmoji.textContent = clickedEmoji || "🍯";
-    loseTitle.textContent = "Faux flan.";
-    loseMsg.textContent = "C'était un imitateur. Mais on ne t'en veut pas.";
+    loseTitle.textContent = W.lose.trickyTitle;
+    loseMsg.textContent = W.lose.trickyMessage;
   } else if (reason === "timeout") {
     loseEmoji.textContent = "⏰";
-    loseTitle.textContent = "Le temps t'a battu.";
-    loseMsg.textContent = "Le flan était là, quelque part. Tu l'as raté.";
+    loseTitle.textContent = W.lose.timeoutTitle;
+    loseMsg.textContent = W.lose.timeoutMessage;
   } else {
     loseEmoji.textContent = "😶";
-    loseTitle.textContent = "Loupé.";
-    loseMsg.textContent = "Mais le flan ne t'a pas raté.";
+    loseTitle.textContent = W.lose.defaultTitle;
+    loseMsg.textContent = W.lose.defaultMessage;
   }
   // L'écran de défaite arrive après la musique complète (~4.5s)
   setTimeout(() => {
