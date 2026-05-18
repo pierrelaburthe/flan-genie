@@ -265,7 +265,7 @@ body {
   .ct-line2 { font-size: 7px; }
   .chasse-title { padding: 3px 8px; }
   .chasse-hud {
-    grid-template-columns: 0.55fr 1fr 1fr 0.45fr;
+    grid-template-columns: repeat(6, 1fr);
     gap: 3px;
   }
   .ch-block { padding: 3px 4px; }
