@@ -872,16 +872,16 @@ function spawnChickenStop() {
   // À l'arrêt : ponte dramatique (jacassement + squawk)
   setTimeout(() => {
     AudioFX.clucksExcited(0.15);
-    setTimeout(() => AudioFX.squawk(0.14), 380);
+    setTimeout(() => AudioFX.squawk(0.14), 150);
     // Œuf pondu sous elle
     const e = document.createElement("div");
     e.className = "wildlife laid-egg";
     e.textContent = "🥚";
     e.style.top = (y + 12) + "vh";
     document.body.appendChild(e);
-    setTimeout(() => e.remove(), 2200);
-  }, 1500);
-  setTimeout(() => c.remove(), 4000);
+    setTimeout(() => e.remove(), 700);
+  }, 500);
+  setTimeout(() => c.remove(), 2100);
 }
 
 // Plusieurs poules qui traversent en groupe (avec décalages)

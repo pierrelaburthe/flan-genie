@@ -1299,7 +1299,7 @@ body.screen-shake { animation: body-shake 0.45s ease-in-out; }
   left: 50%;
   top: 0;
   filter: drop-shadow(6px 8px 0 rgba(0,0,0,0.5));
-  animation: chicken-stop-anim 4s ease-in-out forwards;
+  animation: chicken-stop-anim 2s ease-in-out forwards;
 }
 @keyframes chicken-stop-anim {
   /* Entre par la gauche */
