@@ -2671,13 +2671,13 @@ body.ch-fading .chasse-hud {
   background: linear-gradient(135deg, #d5e8c0 0%, #b5d3a8 100%);
   color: #2a4520;
 }
-.mode-card.mc-medium {
-  background: linear-gradient(135deg, #fde9a5 0%, #f5c945 100%);
-  color: #5a3a0a;
-}
 .mode-card.mc-hardcore {
   background: linear-gradient(135deg, #e88060 0%, #b8442a 100%);
   color: #2a0a05;
+}
+.mode-card.mc-infinity {
+  background: linear-gradient(135deg, #9b59d0 0%, #3d1575 100%);
+  color: #f0e6ff;
 }
 
 /* Thème global selon le mode */
@@ -2698,6 +2698,15 @@ body.mode-hardcore.chasse-body {
     linear-gradient(180deg,
       hsl(calc(28 - var(--intensity, 0) * 28), calc(72% - var(--intensity, 0) * 20%), calc(80% - var(--intensity, 0) * 60%)) 0%,
       hsl(calc(8 - var(--intensity, 0) * 8), calc(68% + var(--intensity, 0) * 5%), calc(60% - var(--intensity, 0) * 50%)) 100%
+    );
+}
+body.mode-infinity.chasse-body {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(160, 80, 220, calc(0.30 + var(--intensity, 0) * 0.15)) 0, transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(60, 10, 130, calc(0.35 + var(--intensity, 0) * 0.25)) 0, transparent 55%),
+    linear-gradient(180deg,
+      hsl(calc(280 - var(--intensity, 0) * 30), calc(60% - var(--intensity, 0) * 20%), calc(78% - var(--intensity, 0) * 58%)) 0%,
+      hsl(calc(258 - var(--intensity, 0) * 18), calc(65% + var(--intensity, 0) * 5%), calc(55% - var(--intensity, 0) * 45%)) 100%
     );
 }
 

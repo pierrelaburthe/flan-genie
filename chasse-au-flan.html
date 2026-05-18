@@ -17,7 +17,7 @@
   <section class="chasse-hud">
     <div class="ch-block">
       <span class="ch-lbl" id="ch-round-label"></span>
-      <span class="ch-val"><span id="ch-round">1</span> / <span id="ch-round-total"></span></span>
+      <span class="ch-val"><span id="ch-round">1</span><span id="ch-round-sep"> / <span id="ch-round-total"></span></span></span>
     </div>
     <div class="ch-block big timer" id="ch-timer-block">
       <span class="ch-lbl" id="ch-time-label"></span>
@@ -67,18 +67,18 @@
               <div class="mc-sub" id="mode-beginner-sub"></div>
             </div>
           </button>
-          <button class="mode-card mc-medium" data-mode="medium">
-            <div class="mc-icon">🍮</div>
-            <div class="mc-info">
-              <div class="mc-label" id="mode-medium-label"></div>
-              <div class="mc-sub" id="mode-medium-sub"></div>
-            </div>
-          </button>
           <button class="mode-card mc-hardcore" data-mode="hardcore">
             <div class="mc-icon">🔥</div>
             <div class="mc-info">
               <div class="mc-label" id="mode-hardcore-label"></div>
               <div class="mc-sub" id="mode-hardcore-sub"></div>
+            </div>
+          </button>
+          <button class="mode-card mc-infinity" data-mode="infinity">
+            <div class="mc-icon">♾️</div>
+            <div class="mc-info">
+              <div class="mc-label" id="mode-infinity-label"></div>
+              <div class="mc-sub" id="mode-infinity-sub"></div>
             </div>
           </button>
         </div>
@@ -103,13 +103,13 @@
             <div class="mc-icon">🌿</div>
             <div class="mc-info"><div class="mc-label" id="mode-win-beginner-label"></div></div>
           </button>
-          <button class="mode-card mc-medium" data-mode="medium" data-from="win">
-            <div class="mc-icon">🍮</div>
-            <div class="mc-info"><div class="mc-label" id="mode-win-medium-label"></div></div>
-          </button>
           <button class="mode-card mc-hardcore" data-mode="hardcore" data-from="win">
             <div class="mc-icon">🔥</div>
             <div class="mc-info"><div class="mc-label" id="mode-win-hardcore-label"></div></div>
+          </button>
+          <button class="mode-card mc-infinity" data-mode="infinity" data-from="win">
+            <div class="mc-icon">♾️</div>
+            <div class="mc-info"><div class="mc-label" id="mode-win-infinity-label"></div></div>
           </button>
         </div>
       </div>
@@ -136,13 +136,13 @@
             <div class="mc-icon">🌿</div>
             <div class="mc-info"><div class="mc-label" id="mode-lose-beginner-label"></div></div>
           </button>
-          <button class="mode-card mc-medium" data-mode="medium" data-from="lose">
-            <div class="mc-icon">🍮</div>
-            <div class="mc-info"><div class="mc-label" id="mode-lose-medium-label"></div></div>
-          </button>
           <button class="mode-card mc-hardcore" data-mode="hardcore" data-from="lose">
             <div class="mc-icon">🔥</div>
             <div class="mc-info"><div class="mc-label" id="mode-lose-hardcore-label"></div></div>
+          </button>
+          <button class="mode-card mc-infinity" data-mode="infinity" data-from="lose">
+            <div class="mc-icon">♾️</div>
+            <div class="mc-info"><div class="mc-label" id="mode-lose-infinity-label"></div></div>
           </button>
         </div>
       </div>

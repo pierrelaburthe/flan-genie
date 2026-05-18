@@ -24,7 +24,21 @@ const POOL_CLOSE = ["🥧", "🥐", "🍪", "🥞", "🟡"];
 const TRAPS_SOFT = ["🍯", "🥮"];
 const TRAPS_HARD = ["🍯", "🥮", "🍩", "🎂", "🧁", "🍰"];
 
-// 3 modes de difficulté
+// Multiplicateurs partagés hardcore / infinity (même difficulté de base)
+const HARDCORE_MULTS = {
+  timeMult: 0.78,
+  chickenMult: 0.65,
+  featherMult: 0.65,
+  eggMult: 0.65,
+  bubblesMult: 0.65,
+  mutationMult: 0.78,
+  swapMult: 0.78,
+  trapsMult: 1.4,
+  chickenSizeMult: 1.15,
+  roosterMult: 1.5,
+};
+
+// 4 modes de difficulté
 const MODES = {
   beginner: {
     label: W.modes.beginner.label,
@@ -40,33 +54,15 @@ const MODES = {
     chickenSizeMult: 0.75,
     roosterMult: 0.3,
   },
-  medium: {
-    label: W.modes.medium.label,
-    sub: W.modes.medium.sub,
-    timeMult: 0.92,
-    chickenMult: 0.85,
-    featherMult: 0.88,
-    eggMult: 0.88,
-    bubblesMult: 0.85,
-    mutationMult: 0.92,
-    swapMult: 0.92,
-    trapsMult: 1.15,
-    chickenSizeMult: 1.05,
-    roosterMult: 1.1,
-  },
   hardcore: {
     label: W.modes.hardcore.label,
     sub: W.modes.hardcore.sub,
-    timeMult: 0.78,
-    chickenMult: 0.65,
-    featherMult: 0.65,
-    eggMult: 0.65,
-    bubblesMult: 0.65,
-    mutationMult: 0.78,
-    swapMult: 0.78,
-    trapsMult: 1.4,
-    chickenSizeMult: 1.15,
-    roosterMult: 1.5,
+    ...HARDCORE_MULTS,
+  },
+  infinity: {
+    label: W.modes.infinity.label,
+    sub: W.modes.infinity.sub,
+    ...HARDCORE_MULTS,
   },
 };
 
@@ -187,7 +183,6 @@ function saveProgress(p) {
 // Seuils en secondes pour décrocher chaque médaille (12 manches complètes)
 const MEDAL_THRESHOLDS = {
   beginner: { gold: 95,  silver: 130 },
-  medium:   { gold: 70,  silver: 100 },
   hardcore: { gold: 52,  silver: 75  },
 };
 
@@ -212,6 +207,17 @@ function saveBestTime(mode, timeSec) {
   return { progress: p, isNewRecord };
 }
 
+function saveBestLevel(mode, level) {
+  const p = loadProgress();
+  if (!p[mode]) p[mode] = { count: 0 };
+  p[mode].count = (p[mode].count || 0) + 1;
+  const isNewRecord = !p[mode].bestLevel || level > p[mode].bestLevel;
+  if (isNewRecord) p[mode].bestLevel = level;
+  p[mode].lastDate = Date.now();
+  saveProgress(p);
+  return { progress: p, isNewRecord };
+}
+
 function formatTime(s) {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
@@ -224,19 +230,29 @@ function updateModeBadges() {
     const mode = card.dataset.mode;
     if (!mode) return;
     card.querySelectorAll(".mc-medal, .mc-record").forEach(el => el.remove());
-    const medal = getMedalForMode(mode, progress);
-    if (medal) {
-      const m = document.createElement("div");
-      m.className = "mc-medal";
-      m.textContent = medal;
-      card.appendChild(m);
-    }
-    const time = progress[mode] && progress[mode].bestTime;
-    if (time) {
-      const t = document.createElement("div");
-      t.className = "mc-record";
-      t.textContent = W.records.label + formatTime(time);
-      card.appendChild(t);
+    if (mode === "infinity") {
+      const bestLevel = progress[mode] && progress[mode].bestLevel;
+      if (bestLevel) {
+        const t = document.createElement("div");
+        t.className = "mc-record";
+        t.textContent = W.records.labelInfinity + bestLevel;
+        card.appendChild(t);
+      }
+    } else {
+      const medal = getMedalForMode(mode, progress);
+      if (medal) {
+        const m = document.createElement("div");
+        m.className = "mc-medal";
+        m.textContent = medal;
+        card.appendChild(m);
+      }
+      const time = progress[mode] && progress[mode].bestTime;
+      if (time) {
+        const t = document.createElement("div");
+        t.className = "mc-record";
+        t.textContent = W.records.label + formatTime(time);
+        card.appendChild(t);
+      }
     }
   });
 }
@@ -259,7 +275,7 @@ function applyMode(modeName) {
     roosterChance: r.roosterChance ? r.roosterChance * m.roosterMult : 0,
   }));
   // Theme class sur le body
-  document.body.classList.remove("mode-beginner", "mode-medium", "mode-hardcore");
+  document.body.classList.remove("mode-beginner", "mode-hardcore", "mode-infinity");
   document.body.classList.add("mode-" + modeName);
 }
 
@@ -268,6 +284,7 @@ const BUBBLES = W.bubbles;
 
 // Présentation de chaque manche avant le round (12 manches, 2 par génie)
 const GENIE_INTROS = W.genieIntros;
+const GENIE_INTROS_INFINITY = W.genieIntrosInfinity;
 
 const state = {
   round: 0,
@@ -286,7 +303,7 @@ const state = {
   perfect: true,
   ambientMuted: false,
   sfxMuted: false,
-  mode: "medium",
+  mode: "beginner",
 };
 
 // Historique pour éviter que le flan reste au même endroit
@@ -813,7 +830,7 @@ function spawnChicken() {
   else c.classList.add("right-to-left");
 
   // Style de course : run / hop / leap (plus on avance, plus de sauts)
-  const roundProg = state.round / Math.max(1, TOTAL_ROUNDS - 1);
+  const roundProg = Math.min(1, state.round / Math.max(1, TOTAL_ROUNDS - 1));
   const jumpRoll = Math.random();
   let jumpStyle = "run";
   if (roundProg > 0.2 && jumpRoll < 0.25) jumpStyle = "hop";
@@ -998,13 +1015,13 @@ function updateTimer() {
 function computeIntensity() {
   const r = ROUNDS[state.round];
   if (!r) return 0;
-  const roundProg = state.round / Math.max(1, TOTAL_ROUNDS - 1);
+  const roundProg = Math.min(1, state.round / Math.max(1, TOTAL_ROUNDS - 1));
   const timeProg = 1 - Math.max(0, state.timeLeft) / r.time;
   let intensity = Math.min(1, roundProg * 0.6 + roundProg * timeProg * 0.4 + (state.round >= 1 ? 0.05 : 0));
   // Mode Débuflan : intensité visuelle fortement atténuée (-60%) pour moins de stress
   if (state.mode === "beginner") intensity *= 0.35;
-  // Mode Hardcôt : un peu plus intense
-  else if (state.mode === "hardcore") intensity = Math.min(1, intensity * 1.1);
+  // Mode Hardcôt / Infini-flan : un peu plus intense
+  else if (state.mode === "hardcore" || state.mode === "infinity") intensity = Math.min(1, intensity * 1.1);
   return intensity;
 }
 
@@ -1013,20 +1030,49 @@ function updateIntensity() {
   document.body.style.setProperty("--intensity", i.toFixed(3));
 }
 
+// Génère un niveau infini jittéré à partir du niveau 12 (base hardcore déjà appliquée)
+function generateInfinityRound(roundIdx) {
+  const base = ROUNDS[ROUNDS_BASE.length - 1];
+  const jitter  = (v, spread) => Math.round(v * (1 + (Math.random() * 2 - 1) * spread));
+  const jitterF = (v, spread) => Math.max(2.5, parseFloat((v * (1 + (Math.random() * 2 - 1) * spread)).toFixed(1)));
+  // Légère escalade plafonnée à +18 % après 25 runs
+  const extra = Math.min(0.18, (roundIdx - ROUNDS_BASE.length) * 0.007);
+  return {
+    ...base,
+    time:             jitterF(base.time * (1 - extra * 0.5), 0.08),
+    trapsN:           Math.max(base.trapsN, jitter(Math.round(base.trapsN * (1 + extra * 0.3)), 0.15)),
+    mutation:         base.mutation         ? Math.max(150,  jitter(Math.round(base.mutation  * (1 - extra * 0.3)), 0.15)) : 0,
+    swap:             base.swap             ? Math.max(200,  jitter(Math.round(base.swap      * (1 - extra * 0.3)), 0.15)) : 0,
+    feathersInterval: base.feathersInterval ? Math.max(120,  jitter(base.feathersInterval, 0.12)) : 0,
+    chickenInterval:  base.chickenInterval  ? Math.max(180,  jitter(base.chickenInterval,  0.12)) : 0,
+    eggInterval:      base.eggInterval      ? Math.max(1200, jitter(base.eggInterval,      0.15)) : 0,
+    bubblesInterval:  base.bubblesInterval  ? Math.max(250,  jitter(base.bubblesInterval,  0.12)) : 0,
+    roosterChance:    Math.min(0.40, (base.roosterChance || 0) * (1 + extra)),
+  };
+}
+
 function nextRound() {
-  if (state.round + 1 >= ROUNDS.length) return winGame();
-  showRoundTransition(state.round + 1, () => startRound(state.round + 1));
+  const nextIdx = state.round + 1;
+  if (state.mode === "infinity" && nextIdx >= ROUNDS_BASE.length) {
+    ROUNDS.push(generateInfinityRound(nextIdx));
+  } else if (state.mode !== "infinity" && nextIdx >= ROUNDS.length) {
+    return winGame();
+  }
+  showRoundTransition(nextIdx, () => startRound(nextIdx));
 }
 
 // Écran d'instruction initiale, plein écran (réutilise le même look que les transitions de manche)
 function showFirstRoundInstruction() {
   const transEl = document.getElementById("ch-transition");
   if (!transEl) return;
+  const meta = state.mode === "infinity"
+    ? W.transition.roundLabel + " 1"
+    : W.transition.roundLabel + " 1 / " + TOTAL_ROUNDS;
   transEl.innerHTML = `
     <div class="trans-genies">${W.symbols.flan}</div>
     <div class="trans-title">${W.transition.findFlanTitle}</div>
     <div class="trans-subtitle">${W.transition.findFlanSubtitle}</div>
-    <div class="trans-meta">${W.transition.roundLabel} 1 / ${TOTAL_ROUNDS}</div>
+    <div class="trans-meta">${meta}</div>
   `;
   transEl.classList.add("show");
   AudioFX.pop(0.13, 660);
@@ -1037,7 +1083,14 @@ function showFirstRoundInstruction() {
 function showRoundTransition(nextIdx, cb) {
   const transEl = document.getElementById("ch-transition");
   if (!transEl) return cb();
-  const intro = GENIE_INTROS[nextIdx];
+
+  const isInfinityRound = state.mode === "infinity" && nextIdx >= TOTAL_ROUNDS;
+  const intro = isInfinityRound
+    ? GENIE_INTROS_INFINITY[(nextIdx - TOTAL_ROUNDS) % GENIE_INTROS_INFINITY.length]
+    : GENIE_INTROS[nextIdx];
+  const meta = isInfinityRound
+    ? W.transition.roundLabel + " " + (nextIdx + 1)
+    : W.transition.roundLabel + " " + (nextIdx + 1) + " / " + TOTAL_ROUNDS;
 
   // Phase 1 : fondu sortie de la grille
   document.body.classList.add("ch-fading");
@@ -1048,7 +1101,7 @@ function showRoundTransition(nextIdx, cb) {
       <div class="trans-genies">${intro.emoji}</div>
       <div class="trans-title">${intro.title}</div>
       <div class="trans-subtitle">${intro.subtitle || ""}</div>
-      <div class="trans-meta">${W.transition.roundLabel} ${nextIdx + 1} / ${TOTAL_ROUNDS}</div>
+      <div class="trans-meta">${meta}</div>
     `;
     transEl.classList.add("show");
     AudioFX.pop(0.13, 740);
@@ -1129,23 +1182,63 @@ function loseGame(reason, clickedEmoji) {
   // Flan qui explose et dégouline + musique de défaite complète
   flanExplosion();
   AudioFX.loseMusic();
-  if (reason === "tricky") {
-    loseEmoji.textContent = clickedEmoji || "🍯";
-    loseTitle.textContent = W.lose.trickyTitle;
-    loseMsg.textContent = W.lose.trickyMessage;
-  } else if (reason === "timeout") {
-    loseEmoji.textContent = "⏰";
-    loseTitle.textContent = W.lose.timeoutTitle;
-    loseMsg.textContent = W.lose.timeoutMessage;
+
+  if (state.mode === "infinity") {
+    const level = state.round + 1;
+    const result = saveBestLevel(state.mode, level);
+    state.lastInfinityLevel = level;
+    state.isNewRecord = result.isNewRecord;
+    const wi = W.infinity;
+    if (reason === "tricky") {
+      loseEmoji.textContent = clickedEmoji || "🍯";
+      loseTitle.textContent = wi.trickyTitle;
+      loseMsg.textContent   = wi.trickyMessage;
+    } else if (reason === "timeout") {
+      loseEmoji.textContent = "⏰";
+      loseTitle.textContent = wi.timeoutTitle;
+      loseMsg.textContent   = wi.timeoutMessage;
+    } else {
+      loseEmoji.textContent = "😶";
+      loseTitle.textContent = wi.defaultTitle;
+      loseMsg.textContent   = wi.defaultMessage;
+    }
+    setTimeout(() => {
+      updateModeBadges();
+      injectInfinityLoseStats(loseEl, state.isNewRecord, state.lastInfinityLevel);
+      showScreen("lose");
+    }, 4500);
   } else {
-    loseEmoji.textContent = "😶";
-    loseTitle.textContent = W.lose.defaultTitle;
-    loseMsg.textContent = W.lose.defaultMessage;
+    if (reason === "tricky") {
+      loseEmoji.textContent = clickedEmoji || "🍯";
+      loseTitle.textContent = W.lose.trickyTitle;
+      loseMsg.textContent   = W.lose.trickyMessage;
+    } else if (reason === "timeout") {
+      loseEmoji.textContent = "⏰";
+      loseTitle.textContent = W.lose.timeoutTitle;
+      loseMsg.textContent   = W.lose.timeoutMessage;
+    } else {
+      loseEmoji.textContent = "😶";
+      loseTitle.textContent = W.lose.defaultTitle;
+      loseMsg.textContent   = W.lose.defaultMessage;
+    }
+    // L'écran de défaite arrive après la musique complète (~4.5s)
+    setTimeout(() => {
+      showScreen("lose");
+    }, 4500);
   }
-  // L'écran de défaite arrive après la musique complète (~4.5s)
-  setTimeout(() => {
-    showScreen("lose");
-  }, 4500);
+}
+
+function injectInfinityLoseStats(screenEl, isNewRecord, level) {
+  let stats = screenEl.querySelector(".victory-stats");
+  if (stats) stats.remove();
+  stats = document.createElement("div");
+  stats.className = "victory-stats";
+  stats.innerHTML = `
+    ${isNewRecord ? '<div class="vs-record">' + W.infinity.newLevelRecord + '</div>' : ''}
+    <div class="vs-row"><span>${W.infinity.levelReached}</span><strong>${level}</strong></div>
+  `;
+  const msg = screenEl.querySelector(".ch-big");
+  if (msg) msg.insertAdjacentElement("afterend", stats);
 }
 
 // ============================================================
@@ -1347,6 +1440,9 @@ function launchFirstRound(mode) {
   if (mode) applyMode(mode);
   state.perfect = true;
   state.gameStartedAt = Date.now();
+  // En mode infini : le compteur N/12 n'a pas de sens, on cache le total
+  const sepEl = document.getElementById("ch-round-sep");
+  if (sepEl) sepEl.hidden = (state.mode === "infinity");
   hideOverlay();
   showFirstRoundInstruction(); // plein écran ~1.4s
   // Démarre après que l'écran d'instruction soit terminé
@@ -1356,7 +1452,7 @@ function launchFirstRound(mode) {
 document.querySelectorAll(".mode-card").forEach(btn => {
   btn.addEventListener("click", (ev) => {
     ev.preventDefault();
-    const mode = btn.getAttribute("data-mode") || "medium";
+    const mode = btn.getAttribute("data-mode") || "beginner";
     launchFirstRound(mode);
   });
 });
@@ -1376,7 +1472,7 @@ const restartBtn = document.getElementById("restart-btn");
 if (restartBtn) {
   restartBtn.onclick = () => {
     stopEverything();
-    launchFirstRound(state.mode || "medium");
+    launchFirstRound(state.mode || "beginner");
   };
 }
 

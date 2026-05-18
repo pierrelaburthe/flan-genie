@@ -11,15 +11,15 @@ window.WORDINGS = {
   modes: {
     beginner: {
       label: "Débuflan",
-      sub: "Tout doux. Pour débuter.",
-    },
-    medium: {
-      label: "Mi-flan",
-      sub: "Un cran au-dessus.",
+      sub: "Le flan à la portée du premier venu.",
     },
     hardcore: {
       label: "Hardcôt",
-      sub: "Trop dur pour la plupart.",
+      sub: "Les poules se rebellent.",
+    },
+    infinity: {
+      label: "Inflanity",
+      sub: "Un enfer sans fin.",
     },
   },
   hud: {
@@ -94,6 +94,17 @@ window.WORDINGS = {
   },
   records: {
     label: "Record ",
+    labelInfinity: "Niveau max ",
+  },
+  infinity: {
+    trickyTitle: "Piégé.",
+    trickyMessage: "Le flan t'observait depuis le début.",
+    timeoutTitle: "Le temps a implosé.",
+    timeoutMessage: "Même l'infini a ses limites.",
+    defaultTitle: "Loupé.",
+    defaultMessage: "L'infini ne pardonne pas.",
+    levelReached: "Niveau atteint",
+    newLevelRecord: "✨ Nouveau record de niveau !",
   },
   bubbles: [
     "Hé !", "Là-bas !", "Non, ici", "Trop tard", "COT COT", "Pas moi",
@@ -115,6 +126,24 @@ window.WORDINGS = {
     { emoji: "🐔🐔🐔🐔🐔", title: "Le cinquième génie", subtitle: "Plus vite, plus dur." },
     { emoji: "🐔🐔🐔🐔🐔🐔", title: "Le sixième génie", subtitle: "Le dernier. Bonne chance." },
     { emoji: "🐔🐔🐔🐔🐔🐔", title: "Le sixième génie", subtitle: "Cocorico final." },
+  ],
+  genieIntrosInfinity: [
+    { emoji: "♾️",             title: "Au-delà des limites",      subtitle: "Seul le chaos t'attend." },
+    { emoji: "🐔🐔🐔🐔🐔🐔",   title: "Tu es encore là ?",        subtitle: "Impressionnant." },
+    { emoji: "🌀",             title: "Et encore",                subtitle: "Et encore. Et encore." },
+    { emoji: "🐔💥",           title: "Plus fort, plus vite",     subtitle: "Plus flan." },
+    { emoji: "🔁",             title: "Boucle infinie",            subtitle: "On n'est pas pressés." },
+    { emoji: "😶",             title: "Tu cherches encore ?",      subtitle: "Respect." },
+    { emoji: "🐔💀",           title: "La poule ne dort plus",    subtitle: "Toi non plus." },
+    { emoji: "🌑",             title: "Le chaos se densifie",     subtitle: "Bonne chance quand même." },
+    { emoji: "😮",             title: "Sérieusement ?",           subtitle: "Vas-y, on regarde." },
+    { emoji: "🐔🐔🐔🐔🐔🐔🐔", title: "Niveau inconnu",            subtitle: "Le flan prolifère." },
+    { emoji: "🔥",             title: "Incandescent",             subtitle: "Ça va finir en cendre." },
+    { emoji: "🐔🐔🐔🐔🐔🐔",   title: "Fragment suivant",         subtitle: "Le flan est indomptable." },
+    { emoji: "💥",             title: "Explosion proche",         subtitle: "On voit pas comment tu tiens." },
+    { emoji: "💩🐔",           title: "Absolument tout",          subtitle: "Contre toi." },
+    { emoji: "👓",             title: "T'as des yeux bioniques ?", subtitle: "Demande-toi." },
+    { emoji: "🐔🕔",           title: "Pas d'heure pour le flan", subtitle: "Ni pour les fous." },
   ],
 };
 
@@ -176,10 +205,10 @@ function applyChasseWordings() {
 
   setText("mode-beginner-label", w.modes.beginner.label);
   setText("mode-beginner-sub", w.modes.beginner.sub);
-  setText("mode-medium-label", w.modes.medium.label);
-  setText("mode-medium-sub", w.modes.medium.sub);
   setText("mode-hardcore-label", w.modes.hardcore.label);
   setText("mode-hardcore-sub", w.modes.hardcore.sub);
+  setText("mode-infinity-label", w.modes.infinity.label);
+  setText("mode-infinity-sub", w.modes.infinity.sub);
 
   setText("win-title", w.win.title);
   setText("win-subtitle", w.win.subtitle);
@@ -189,8 +218,8 @@ function applyChasseWordings() {
   setHtml("win-invite-hint", w.win.inviteHintHtml);
   setText("win-mode-title", w.win.modeTitle);
   setText("mode-win-beginner-label", w.modes.beginner.label);
-  setText("mode-win-medium-label", w.modes.medium.label);
   setText("mode-win-hardcore-label", w.modes.hardcore.label);
+  setText("mode-win-infinity-label", w.modes.infinity.label);
   setText("win-hub-label", w.win.hub);
 
   setText("lose-title", w.lose.title);
@@ -201,8 +230,8 @@ function applyChasseWordings() {
   setHtml("lose-invite-hint", w.lose.inviteHintHtml);
   setText("lose-mode-title", w.lose.modeTitle);
   setText("mode-lose-beginner-label", w.modes.beginner.label);
-  setText("mode-lose-medium-label", w.modes.medium.label);
   setText("mode-lose-hardcore-label", w.modes.hardcore.label);
+  setText("mode-lose-infinity-label", w.modes.infinity.label);
 }
 
 if (document.readyState === "loading") {
