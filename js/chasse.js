@@ -1354,45 +1354,42 @@ function fireworksShow() {
   }, 2200);
 }
 
-// Pluie de flans qui dégoulinent depuis le haut, avec bruits de verre
+// Un seul gros flan centré tombe, s'écrase au tiers bas de l'écran, puis tombe lentement hors champ
 function flanExplosion() {
   AudioFX.splat(0.18);
-  shakeScreen();
-  // 28-34 drips de flan échelonnés sur ~3 secondes
-  const count = 28 + Math.floor(Math.random() * 7);
-  for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      spawnFlanDrip();
-      if (i % 4 === 0) AudioFX.glassSlide(0.06 + Math.random() * 0.05);
-    }, 80 + i * 95);
-  }
-  // Bruits de glissement supplémentaires pendant tout le dégoulinement
-  for (let i = 0; i < 6; i++) {
-    setTimeout(() => AudioFX.glassSlide(0.05 + Math.random() * 0.06), 1500 + i * 480);
-  }
-}
 
-function spawnFlanDrip() {
   const drip = document.createElement("div");
   drip.className = "wildlife flan-drip";
   drip.textContent = "🍮";
-  drip.style.left = (5 + Math.random() * 90) + "vw";
-  drip.style.top = (-5 + Math.random() * 25) + "vh"; // démarre tout en haut
-  drip.style.fontSize = (38 + Math.random() * 70) + "px";
-  drip.style.filter = "drop-shadow(2px 4px 0 rgba(0,0,0,0.3))";
+  drip.style.position = "fixed";
+  drip.style.left = "50%";
+  drip.style.top = "0";
+  drip.style.fontSize = "220px";
+  drip.style.zIndex = "10002";
+  drip.style.filter = "drop-shadow(2px 8px 0 rgba(0,0,0,0.4))";
+  drip.style.transformOrigin = "center bottom";
   document.body.appendChild(drip);
 
-  // Anim : descend en s'étirant verticalement (effet dégoulinement)
-  drip.animate(
-    [
-      { transform: "translateY(0) scaleY(1)", opacity: 1 },
-      { transform: "translateY(40vh) scaleY(1.7)", offset: 0.4, opacity: 1 },
-      { transform: "translateY(100vh) scaleY(2.6)", offset: 0.85, opacity: 0.8 },
-      { transform: "translateY(125vh) scaleY(3.2)", opacity: 0 }
-    ],
-    { duration: 2400 + Math.random() * 1300, easing: "cubic-bezier(0.55, 0, 0.85, 1)", fill: "forwards" }
-  );
-  setTimeout(() => drip.remove(), 4200);
+  // Durée totale : 4200 ms
+  // Phase 1 (0 → 13 %) : chute rapide depuis -15vh jusqu'à 45vh (milieu écran)
+  // Phase 2 (13 % → 26%) : écrasement brusque puis rebond
+  // Phase 3 (26 % → 100%) : glissement lent hors de l'écran par le bas
+  const D = 4200;
+  drip.animate([
+    { offset: 0,     transform: "translateX(-50%) translateY(-20vh) scaleX(1)    scaleY(1)",    opacity: 1, easing: "cubic-bezier(0.5, 0, 0.9, 0.8)" },
+    { offset: 0.130, transform: "translateX(-50%) translateY(35vh)  scaleX(1)    scaleY(1)",    opacity: 1, easing: "ease-out" },
+    { offset: 0.160, transform: "translateX(-50%) translateY(38vh)  scaleX(3.0)  scaleY(0.12)", opacity: 1, easing: "ease-out" },
+    { offset: 0.210, transform: "translateX(-50%) translateY(33vh)  scaleX(1.3)  scaleY(0.70)", opacity: 1, easing: "ease-in-out" },
+    { offset: 0.260, transform: "translateX(-50%) translateY(35vh)  scaleX(1)    scaleY(1)",    opacity: 1, easing: "cubic-bezier(0.1, 0, 0.25, 1)" },
+    { offset: 0.580, transform: "translateX(-50%) translateY(65vh)  scaleX(0.88) scaleY(1.9)",  opacity: 1 },
+    { offset: 1,     transform: "translateX(-50%) translateY(130vh) scaleX(0.75) scaleY(3.0)",  opacity: 0 },
+  ], { duration: D, fill: "forwards" });
+
+  // Sons calés sur les phases
+  setTimeout(() => { AudioFX.thud(0.32); shakeScreen(); AudioFX.glassSlide(0.10); }, Math.round(D * 0.130));
+  setTimeout(() => AudioFX.glassSlide(0.08), Math.round(D * 0.380));
+  setTimeout(() => AudioFX.glassSlide(0.06), Math.round(D * 0.650));
+  setTimeout(() => drip.remove(), D + 100);
 }
 
 function splatFlan() {
