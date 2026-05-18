@@ -94,12 +94,12 @@ window.WORDINGS = {
   },
   records: {
     label: "Record ",
-    labelInfinity: "Niveau max ",
+    labelInfinity: "Meilleur niveau : ",
   },
   infinity: {
-    trickyTitle: "Piégé.",
-    trickyMessage: "Le flan t'observait depuis le début.",
-    timeoutTitle: "Le temps a implosé.",
+    trickyTitle: "C'était pas un flan.",
+    trickyMessage: "C'était un imitateur. Mais on ne t'en veut pas.",
+    timeoutTitle: "Le temps est écoulé.",
     timeoutMessage: "Même l'infini a ses limites.",
     defaultTitle: "Loupé.",
     defaultMessage: "L'infini ne pardonne pas.",
@@ -163,8 +163,8 @@ function applyChasseWordings() {
 
   document.title = "La Chasse au Flan — Avignon";
 
-  setText("ch-title-line1", w.intro.title);
-  setText("ch-title-line2", "Avignon · Festival 2026");
+  setText("ch-title-line1", "Le Flan Pâtissier");
+  setText("ch-title-line2", "Avignon · Festival Off 2026");
 
   setText("ch-round-label", w.hud.roundLabel);
   setText("ch-round-total", w.hud.roundTotal);
