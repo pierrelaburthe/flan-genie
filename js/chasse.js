@@ -469,7 +469,7 @@ function stopMutations() {
 // ============================================================
 
 function startWildlife(r) {
-  stopWildlife();
+  stopWildlifeTimers();
   if (r.feathersInterval) {
     state.feathersId = setInterval(() => {
       if (!state.playing) return;
@@ -678,11 +678,15 @@ function pulseCell(cell, intensity) {
   anim.onfinish = () => { cell.style.zIndex = prevZ || ""; };
 }
 
-function stopWildlife() {
+function stopWildlifeTimers() {
   if (state.feathersId) { clearInterval(state.feathersId); state.feathersId = null; }
   if (state.chickenId) { clearInterval(state.chickenId); state.chickenId = null; }
   if (state.eggId) { clearInterval(state.eggId); state.eggId = null; }
   if (state.bubblesId) { clearInterval(state.bubblesId); state.bubblesId = null; }
+}
+
+function stopWildlife() {
+  stopWildlifeTimers();
   document.querySelectorAll(".wildlife, .reaction-banner").forEach(el => el.remove());
 }
 
@@ -833,7 +837,7 @@ function spawnChicken() {
     setTimeout(() => AudioFX.flap(0.08), 400);
     setTimeout(() => AudioFX.flap(0.06), 1100);
   }
-  setTimeout(() => c.remove(), 2700);
+  setTimeout(() => c.remove(), 3200);
 }
 
 function spawnChickenStop() {
@@ -919,7 +923,7 @@ function onCellClick(btn, isFlan, isTricky) {
     state.inTransition = true; // garde la musique et le cœur actifs
     clearInterval(state.timerId);
     stopMutations();
-    stopWildlife();
+    stopWildlifeTimers(); // stoppe les intervalles mais laisse les overlays finir leur animation
     stopCellPulse();
     // musique + cœur restent actifs pendant la transition
     setTimeout(() => nextRound(), 700);

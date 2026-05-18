@@ -56,9 +56,9 @@ window.WORDINGS = {
   win: {
     title: "Bravo !",
     subtitle: "Tu as trouvé le flan.",
-    inviteLine1: "Tu as gagné le droit de venir",
+    inviteLine1: "Tu as gagné le droit de voir",
     inviteTitle: "LE FLAN PÂTISSIER",
-    inviteMetaHtml: "<strong>Aujourd'hui à 15 h 30</strong><br>Théâtre du Tremplin, Avignon",
+    inviteMetaHtml: "<strong>Tous les jours à 15 h 30</strong><br>Théâtre Tremplin, Avignon",
     inviteHintHtml: "Place <strong>payante</strong>, comme tout le monde. On n'a pas les moyens, désolé.<br>Mais on est très contents que tu viennes.",
     modeTitle: "Rejouer",
     newRecord: "✨ Nouveau record !",
@@ -67,9 +67,9 @@ window.WORDINGS = {
   lose: {
     title: "Loupé.",
     message: "Tu as raté le flan, mais le flan ne t'a pas raté.",
-    inviteLine1: "Tu peux quand même venir",
+    inviteLine1: "Tu peux quand même venir voir",
     inviteTitle: "LE FLAN PÂTISSIER",
-    inviteMetaHtml: "<strong>Aujourd'hui à 15 h 30</strong><br>Théâtre du Tremplin, Avignon",
+    inviteMetaHtml: "<strong>Tous les jours à 15 h 30</strong><br>Théâtre Tremplin, Avignon",
     inviteHintHtml: "Ca t'aidera peut-être à t'améliorer.",
     modeTitle: "Réessayer",
     trickyTitle: "Faux flan.",
