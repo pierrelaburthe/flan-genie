@@ -50,7 +50,7 @@ window.WORDINGS = {
   },
   intro: {
     title: "La Chasse au Flan",
-    leadHtml: "Trouve le <strong>🍮</strong> dans la foule. <strong>12 manches</strong>. Évite les imitateurs.",
+    leadHtml: "Comme Œugénie, trouve le <strong>🍮</strong> dans la foule.",
     modeTitle: "Choisis ton mode",
   },
   win: {
@@ -163,7 +163,7 @@ function applyChasseWordings() {
 
   document.title = "La Chasse au Flan — Avignon";
 
-  setText("ch-title-line1", "Le Flan Pâtissier");
+  setText("ch-title-line1", "Le Flan Patissier");
   setText("ch-title-line2", "Avignon · Festival Off 2026");
 
   setText("ch-round-label", w.hud.roundLabel);

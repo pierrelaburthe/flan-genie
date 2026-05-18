@@ -1060,6 +1060,7 @@ function showFirstRoundInstruction() {
     <div class="trans-subtitle">${W.transition.findFlanSubtitle}</div>
     <div class="trans-meta">${meta}</div>
   `;
+  transEl.className = `ch-transition mode-${state.mode}`;
   transEl.classList.add("show");
   AudioFX.pop(0.13, 660);
   setTimeout(() => AudioFX.pop(0.10, 880), 90);
@@ -1089,6 +1090,7 @@ function showRoundTransition(nextIdx, cb) {
       <div class="trans-subtitle">${intro.subtitle || ""}</div>
       <div class="trans-meta">${meta}</div>
     `;
+    transEl.className = `ch-transition mode-${state.mode}`;
     transEl.classList.add("show");
     AudioFX.pop(0.13, 740);
     setTimeout(() => AudioFX.pop(0.10, 920), 90);

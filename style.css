@@ -3477,6 +3477,40 @@ body.screen-shake { animation: body-shake 0.45s ease-in-out; }
   box-shadow: 3px 3px 0 var(--ink);
 }
 
+/* Thèmes de transition selon le mode */
+.ch-transition.mode-beginner {
+  background: linear-gradient(135deg, #d4edce 0%, #a8d4a0 55%, #5a9a50 100%);
+}
+.ch-transition.mode-beginner .trans-title,
+.ch-transition.mode-beginner .trans-subtitle,
+.ch-transition.mode-beginner .trans-meta,
+.ch-transition.mode-beginner .trans-genies { color: #1a4a14; }
+.ch-transition.mode-beginner .trans-genies { text-shadow: 5px 5px 0 rgba(255,255,255,0.4); }
+.ch-transition.mode-beginner .trans-title { text-shadow: 4px 4px 0 rgba(255,255,255,0.5), -1px -1px 0 #3a7a30; }
+.ch-transition.mode-beginner .trans-meta { border-color: #1a4a14; box-shadow: 3px 3px 0 #1a4a14; background: rgba(255,255,255,0.45); }
+
+.ch-transition.mode-hardcore {
+  background: linear-gradient(135deg, #e86060 0%, #c02020 55%, #a81414 100%);
+}
+.ch-transition.mode-hardcore .trans-title,
+.ch-transition.mode-hardcore .trans-subtitle,
+.ch-transition.mode-hardcore .trans-meta,
+.ch-transition.mode-hardcore .trans-genies { color: #fff5f5; }
+.ch-transition.mode-hardcore .trans-genies { text-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
+.ch-transition.mode-hardcore .trans-title { text-shadow: 4px 4px 0 rgba(0,0,0,0.35), -1px -1px 0 #ff9090; }
+.ch-transition.mode-hardcore .trans-meta { border-color: #fff5f5; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); background: rgba(255,255,255,0.15); }
+
+.ch-transition.mode-infinity {
+  background: linear-gradient(135deg, #3a3a3a 0%, #222222 55%, #111111 100%);
+}
+.ch-transition.mode-infinity .trans-title,
+.ch-transition.mode-infinity .trans-subtitle,
+.ch-transition.mode-infinity .trans-meta,
+.ch-transition.mode-infinity .trans-genies { color: #f0f0f0; }
+.ch-transition.mode-infinity .trans-genies { text-shadow: 5px 5px 0 rgba(255,255,255,0.1); }
+.ch-transition.mode-infinity .trans-title { text-shadow: 4px 4px 0 rgba(0,0,0,0.5), -1px -1px 0 #888; }
+.ch-transition.mode-infinity .trans-meta { border-color: #f0f0f0; box-shadow: 3px 3px 0 rgba(0,0,0,0.4); background: rgba(255,255,255,0.08); }
+
 @media (max-width: 720px) {
   .trans-title { font-size: 44px; }
   .trans-genies { font-size: 56px; }
