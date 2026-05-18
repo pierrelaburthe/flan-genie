@@ -175,12 +175,6 @@ function applyChasseWordings() {
   }
   setText("sfx-btn-label", w.hud.sfx.label);
 
-  const homeBtn = document.getElementById("home-btn");
-  if (homeBtn) {
-    homeBtn.title = w.hud.home.title;
-    homeBtn.setAttribute("aria-label", w.hud.home.aria);
-  }
-
   setText("intro-title", w.intro.title);
   setHtml("intro-lead", w.intro.leadHtml);
   setText("intro-mode-title", w.intro.modeTitle);

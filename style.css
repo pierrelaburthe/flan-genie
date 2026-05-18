@@ -2002,7 +2002,7 @@ body {
 
 .chasse-hud {
   display: grid;
-  grid-template-columns: 0.8fr 1.3fr 1.3fr 1.3fr 0.5fr;
+  grid-template-columns: 0.8fr 1.3fr 1.3fr 1.3fr;
   gap: 8px;
   align-items: stretch;
   flex-shrink: 0;
@@ -2065,13 +2065,13 @@ body.mode-hardcore .p-dot.done { background: #b8442a; border-color: #b8442a; }
 body.mode-beginner .p-dot.done { background: #5b8e58; border-color: #5b8e58; }
 
 /* Bloc des boutons audio (à droite du timer) */
-.ch-audio-block, .ch-restart-block, .ch-home-block {
+.ch-audio-block, .ch-restart-block {
   flex-direction: row !important;
   gap: 6px;
   padding: 6px !important;
 }
 .ch-restart-block .audio-btn,
-.ch-home-block .audio-btn { width: 100%; }
+.ch-audio-block .audio-btn { width: 100%; }
 .restart-btn-ingame {
   background: var(--corail-soft) !important;
   color: var(--ink) !important;
@@ -2123,13 +2123,6 @@ body.mode-beginner .p-dot.done { background: #5b8e58; border-color: #5b8e58; }
   font-weight: bold;
   white-space: nowrap;
 }
-.audio-btn.home-btn {
-  flex: 0 0 auto;
-  width: 48px;
-  background: var(--ink);
-  color: var(--paper);
-}
-.audio-btn.home-btn .audio-icon { color: var(--jaune); font-size: 24px; }
 .audio-btn.muted {
   background: var(--corail-soft);
   opacity: 0.85;
@@ -2157,13 +2150,13 @@ body.mode-beginner .p-dot.done { background: #5b8e58; border-color: #5b8e58; }
   .ct-line1 { font-size: 16px; }
   .ct-line2 { font-size: 8px; letter-spacing: 0.15em; }
 
-  /* HUD mobile : 2 lignes — ligne 1 (Manche / Temps / Hub) + ligne 2 (Restart / Audio) */
+  /* HUD mobile : 2 lignes — ligne 1 (Manche / Temps) + ligne 2 (Restart / Audio) */
   .chasse-hud {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: auto auto;
     grid-template-areas:
-      "manche manche temps temps temps hub"
+      "manche manche temps temps temps temps"
       "restart restart restart audio audio audio";
     gap: 4px;
   }
@@ -2171,7 +2164,6 @@ body.mode-beginner .p-dot.done { background: #5b8e58; border-color: #5b8e58; }
   .chasse-hud > .ch-block:nth-child(2) { grid-area: temps; }
   .chasse-hud > .ch-restart-block { grid-area: restart; }
   .chasse-hud > .ch-audio-block { grid-area: audio; }
-  .chasse-hud > .ch-home-block { grid-area: hub; }
   .ch-block { padding: 4px 6px; }
   .ch-lbl { font-size: 8px; letter-spacing: 0.05em; }
   .ch-val { font-size: 14px; }
@@ -2182,8 +2174,7 @@ body.mode-beginner .p-dot.done { background: #5b8e58; border-color: #5b8e58; }
   .audio-btn { min-height: 40px; padding: 4px 2px; }
   .audio-btn .audio-icon { font-size: 19px; }
   .audio-btn .audio-lbl { display: none; }
-  .audio-btn.home-btn { width: 100%; min-height: 40px; }
-  .ch-audio-block, .ch-restart-block, .ch-home-block { gap: 4px; padding: 4px !important; }
+  .ch-audio-block, .ch-restart-block { gap: 4px; padding: 4px !important; }
 
   /* Grille : prend toute la largeur mobile, pas d'ombres qui débordent */
   .chasse-grid-wrap {
