@@ -938,10 +938,24 @@ body.screen-shake { animation: body-shake 0.45s ease-in-out; }
   font-weight: 700;
   text-transform: uppercase;
   color: var(--paper);
-  margin: 6px 0 10px;
+  margin: 6px 0 0;
   letter-spacing: 0.05em;
 }
 .invite-meta { font-size: 13px; line-height: 1.6; color: var(--paper-3); }
+.invite-book-btn {
+  display: inline-block;
+  margin: 10px auto 4px;
+  padding: 8px 20px;
+  background: var(--rose);
+  color: var(--paper);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.invite-book-btn:hover { opacity: 0.85; }
 .invite-hint {
 }
 .invite-hint {
