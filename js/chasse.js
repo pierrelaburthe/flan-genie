@@ -545,6 +545,7 @@ function startWildlife(r) {
 // Continue de tourner pendant les transitions pour garder la tension.
 function startBarnyardMusic() {
   if (state.beatTimeout) return; // déjà active : on garde la continuité
+  if (!state.ambientMuted) AudioFX.startMusic();
   state.beatCount = 0;
   const tick = () => {
     if (!state.playing && !state.inTransition) return;
@@ -585,6 +586,7 @@ function startBarnyardMusic() {
 
 function stopBarnyardMusic() {
   if (state.beatTimeout) { clearTimeout(state.beatTimeout); state.beatTimeout = null; }
+  AudioFX.stopMusic();
 }
 
 // Battement de cœur qui s'accélère et s'amplifie avec l'intensité
@@ -1494,6 +1496,8 @@ if (ambienceBtn) {
     state.ambientMuted = !state.ambientMuted;
     ambienceBtn.classList.toggle("muted", state.ambientMuted);
     ambienceBtn.querySelector(".audio-icon").textContent = state.ambientMuted ? "🔇" : "🎵";
+    if (state.ambientMuted) AudioFX.stopMusic();
+    else if (state.playing || state.inTransition) AudioFX.startMusic();
   };
 }
 if (sfxBtn) {

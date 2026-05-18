@@ -572,66 +572,190 @@ const AudioFX = (() => {
   function setSfxMuted(m) { sfxMuted = m; }
   function isSfxMuted() { return sfxMuted; }
 
-  // ---------- Soundtrack en boucle ----------
-  let musicInterval = null;
-  let musicNodes = [];
-  let musicStep = 0;
-  // Progression mineure douce : Am - F - C - G (4 mesures)
-  // Notes basses (fondamentales) + arpège pad
-  const MUSIC_PATTERN = [
-    { bass: 110.00, pad: [220.00, 261.63, 329.63] }, // A
-    { bass: 110.00, pad: [220.00, 261.63, 329.63] },
-    { bass: 87.31,  pad: [174.61, 220.00, 261.63] }, // F
-    { bass: 87.31,  pad: [174.61, 220.00, 261.63] },
-    { bass: 130.81, pad: [196.00, 246.94, 329.63] }, // C-ish
-    { bass: 130.81, pad: [196.00, 246.94, 329.63] },
-    { bass: 98.00,  pad: [196.00, 246.94, 293.66] }, // G
-    { bass: 98.00,  pad: [196.00, 246.94, 293.66] },
+  // ---------- Soundtrack 8-bit en boucle ----------
+  // Un seul AudioBuffer contient mélodie + harmonie + basse + percus + pause.
+  // AudioBufferSourceNode loop=true : aucun timer JS, aucune automation de gain.
+  let _musicSource = null;
+  let _melodyAudioBuf = null; // rebuilt if null
+
+  // 1 unité = noire à 175 BPM (0.343 s)
+  const BEAT_8BIT = 0.343;
+  // Articulation mélodie : 55 % son, 45 % silence
+  const ARTICULATION = 0.55;
+  // Respiration entre boucles : 1 noire
+  const LOOP_PAUSE_BEATS = 1;
+
+  const MELODY_8BIT = [
+    { f: 493.88, len: 1   }, // B4
+    { f: 392.00, len: 1.5 }, // G4
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 440.00, len: 0.5 }, // A4
+    { f: 587.33, len: 0.5 }, // D5
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 392.00, len: 0.5 }, // G4
+    { f: 493.88, len: 1   }, // B4
+    { f: 392.00, len: 1.5 }, // G4
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 440.00, len: 0.5 }, // A4
+    { f: 587.33, len: 0.5 }, // D5
+    { f: 392.00, len: 1   }, // G4
   ];
 
-  function playMusicTick() {
-    if (muted) return;
-    const c = ensure();
-    const t = c.currentTime;
-    const step = MUSIC_PATTERN[musicStep % MUSIC_PATTERN.length];
+  // Harmony : tierce majeure au-dessus de chaque note de mélodie
+  const HARMONY_8BIT = [
+    { f: 622.25, len: 1   }, // D#5 / Eb5  (+m3 de B4)
+    { f: 493.88, len: 1.5 }, // B4         (+M3 de G4)
+    { f: 622.25, len: 0.5 }, // Eb5
+    { f: 554.37, len: 0.5 }, // C#5        (+M3 de A4)
+    { f: 739.99, len: 0.5 }, // F#5        (+M3 de D5)
+    { f: 622.25, len: 0.5 }, // Eb5
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 622.25, len: 1   }, // Eb5
+    { f: 493.88, len: 1.5 }, // B4
+    { f: 622.25, len: 0.5 }, // Eb5
+    { f: 554.37, len: 0.5 }, // C#5
+    { f: 739.99, len: 0.5 }, // F#5
+    { f: 493.88, len: 1   }, // B4
+  ];
 
-    // Basse douce
-    const bassOsc = c.createOscillator();
-    const bassG = c.createGain();
-    bassOsc.type = "sine";
-    bassOsc.frequency.value = step.bass;
-    bassOsc.connect(bassG); bassG.connect(c.destination);
-    gainEnvelope(bassG, 0.04, 0.05, 0.7, 0.4, t);
-    bassOsc.start(t); bassOsc.stop(t + 1.2);
+  // Bass : 1 octave sous la mélodie, notes courtes
+  const BASS_8BIT = [
+    { f: 246.94, start: 0,    len: 0.6  }, // B3
+    { f: 196.00, start: 1,    len: 0.9  }, // G3
+    { f: 246.94, start: 2.5,  len: 0.3  }, // B3
+    { f: 220.00, start: 3,    len: 0.3  }, // A3
+    { f: 293.66, start: 3.5,  len: 0.3  }, // D4
+    { f: 246.94, start: 4,    len: 0.3  }, // B3
+    { f: 196.00, start: 4.5,  len: 0.3  }, // G3
+    { f: 246.94, start: 5,    len: 0.6  }, // B3
+    { f: 196.00, start: 6,    len: 0.9  }, // G3
+    { f: 246.94, start: 7.5,  len: 0.3  }, // B3
+    { f: 220.00, start: 8,    len: 0.3  }, // A3
+    { f: 293.66, start: 8.5,  len: 0.3  }, // D4
+    { f: 196.00, start: 9,    len: 0.6  }, // G3
+  ];
 
-    // Arpège (pad)
-    step.pad.forEach((freq, i) => {
-      const o = c.createOscillator();
-      const g = c.createGain();
-      const f = c.createBiquadFilter();
-      o.type = "triangle";
-      o.frequency.value = freq;
-      f.type = "lowpass"; f.frequency.value = 1200;
-      o.connect(f); f.connect(g); g.connect(c.destination);
-      const delay = 0.2 + i * 0.18;
-      gainEnvelope(g, 0.018, 0.08, 0.3, 0.5, t + delay);
-      o.start(t + delay); o.stop(t + delay + 0.95);
-    });
+  function _writeTriangle(data, pos, freq, sr, samples, volume, articulation) {
+    const soundSamples = Math.round(samples * articulation);
+    const fadeLen = Math.min(128, Math.round(sr * 0.004));
+    const period = sr / freq;
+    for (let i = 0; i < soundSamples; i++) {
+      const phase = (i % period) / period;
+      const v = volume * (1 - 4 * Math.abs(phase - 0.5));
+      let env = 1;
+      if (i < fadeLen) env = i / fadeLen;
+      else if (i >= soundSamples - fadeLen) env = (soundSamples - 1 - i) / fadeLen;
+      data[pos + i] += v * env;
+    }
+  }
 
-    musicStep++;
+  // Kick : sine très courte qui descend rapidement
+  function _writeKick(data, samplePos, sr, totalSamples, vol) {
+    const dur = Math.round(sr * 0.10);
+    if (samplePos + dur > totalSamples) return;
+    for (let i = 0; i < dur; i++) {
+      const t = i / sr;
+      const freq = 180 * Math.exp(-25 * t);
+      const phase = 2 * Math.PI * freq * t;
+      const env = Math.exp(-18 * t);
+      data[samplePos + i] += vol * Math.sin(phase) * env;
+    }
+  }
+
+  // Hi-hat : bruit blanc très court, filtré aigu
+  function _writeHihat(data, samplePos, sr, totalSamples, vol) {
+    const dur = Math.round(sr * 0.028);
+    if (samplePos + dur > totalSamples) return;
+    for (let i = 0; i < dur; i++) {
+      const env = 1 - i / dur;
+      // pseudo-bruit via harmoniques hautes fréquences
+      const t = i / sr;
+      const v = (Math.sin(2 * Math.PI * 8000 * t) + Math.sin(2 * Math.PI * 11200 * t)) * 0.5;
+      data[samplePos + i] += vol * v * env;
+    }
+  }
+
+  function _buildMelodyAudioBuffer(c) {
+    const sr = c.sampleRate;
+    const melodyBeats  = MELODY_8BIT.reduce((s, n) => s + n.len, 0);
+    const totalBeats   = melodyBeats + LOOP_PAUSE_BEATS;
+    const totalSamples = Math.round(totalBeats * BEAT_8BIT * sr);
+
+    const audioBuf = c.createBuffer(1, totalSamples, sr);
+    const data = audioBuf.getChannelData(0);
+
+    // --- Mélodie ---
+    let pos = 0;
+    for (const note of MELODY_8BIT) {
+      const slotSamples = Math.round(note.len * BEAT_8BIT * sr);
+      _writeTriangle(data, pos, note.f, sr, slotSamples, 0.12, ARTICULATION);
+      pos += slotSamples;
+    }
+
+    // --- Harmonie (même rythme, volume plus doux) ---
+    pos = 0;
+    for (const note of HARMONY_8BIT) {
+      const slotSamples = Math.round(note.len * BEAT_8BIT * sr);
+      _writeTriangle(data, pos, note.f, sr, slotSamples, 0.055, ARTICULATION);
+      pos += slotSamples;
+    }
+
+    // --- Basse (sine) ---
+    for (const bn of BASS_8BIT) {
+      const bStart   = Math.round(bn.start * BEAT_8BIT * sr);
+      const bSamples = Math.round(bn.len   * BEAT_8BIT * sr);
+      if (bStart + bSamples > totalSamples) continue;
+      const fadeLen = Math.min(256, Math.round(sr * 0.008));
+      const period  = sr / bn.f;
+      for (let i = 0; i < bSamples; i++) {
+        const phase = (i % period) / period;
+        const v = 0.09 * Math.sin(2 * Math.PI * phase);
+        let env = 1;
+        if (i < fadeLen) env = i / fadeLen;
+        else if (i >= bSamples - fadeLen) env = (bSamples - 1 - i) / fadeLen;
+        data[bStart + i] += v * env;
+      }
+    }
+
+    // --- Percussions : kick sur les temps forts, hi-hat en doubles croches ---
+    // Grille en croches (0.5 beat) sur toute la durée mélodie
+    const halfBeat = BEAT_8BIT * 0.5;
+    const numEighths = Math.floor(melodyBeats / 0.5);
+    for (let i = 0; i < numEighths; i++) {
+      const t = Math.round(i * halfBeat * sr);
+      const beat = i * 0.5; // position en beats
+      // Kick : sur chaque noire (0, 1, 2, …)
+      if (i % 2 === 0) _writeKick(data, t, sr, totalSamples, 0.18);
+      // Hi-hat : sur chaque croche
+      _writeHihat(data, t, sr, totalSamples, 0.06);
+    }
+
+    return audioBuf;
   }
 
   function startMusic() {
-    if (musicInterval) return;
-    musicStep = 0;
-    ensure();
-    playMusicTick();
-    musicInterval = setInterval(playMusicTick, 1100);
+    if (_musicSource) return;
+    const c = ensure();
+    if (!_melodyAudioBuf) _melodyAudioBuf = _buildMelodyAudioBuffer(c);
+    const src = c.createBufferSource();
+    src.buffer = _melodyAudioBuf;
+    src.loop = true;
+    const filter = c.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 3400;
+    filter.Q.value = 0.5;
+    src.connect(filter);
+    filter.connect(c.destination);
+    src.start();
+    _musicSource = src;
   }
 
   function stopMusic() {
-    if (musicInterval) clearInterval(musicInterval);
-    musicInterval = null;
+    if (_musicSource) {
+      try { _musicSource.stop(); } catch (e) {}
+      _musicSource.disconnect();
+      _musicSource = null;
+    }
   }
 
   return {
