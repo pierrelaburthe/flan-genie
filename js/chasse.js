@@ -182,8 +182,8 @@ function saveProgress(p) {
 
 // Seuils en secondes pour décrocher chaque médaille (12 manches complètes)
 const MEDAL_THRESHOLDS = {
-  beginner: { gold: 95,  silver: 130 },
-  hardcore: { gold: 52,  silver: 75  },
+  beginner: { gold: 35, silver: 45 },
+  hardcore: { gold: 35, silver: 40 },
 };
 
 function getMedalForMode(mode, progress) {
@@ -194,6 +194,15 @@ function getMedalForMode(mode, progress) {
   if (p.bestTime <= t.gold) return "🥇";
   if (p.bestTime <= t.silver) return "🥈";
   return "🥉";
+}
+
+function getMedalForInfinity(progress) {
+  const p = progress["infinity"];
+  if (!p || !p.bestLevel) return null;
+  if (p.bestLevel > 50) return "🥇";
+  if (p.bestLevel > 30) return "🥈";
+  if (p.bestLevel > 15) return "🥉";
+  return null;
 }
 
 function saveBestTime(mode, timeSec) {
@@ -233,6 +242,13 @@ function updateModeBadges() {
     if (mode === "infinity") {
       const bestLevel = progress[mode] && progress[mode].bestLevel;
       if (bestLevel) {
+        const medal = getMedalForInfinity(progress);
+        if (medal) {
+          const m = document.createElement("div");
+          m.className = "mc-medal";
+          m.textContent = medal;
+          card.appendChild(m);
+        }
         const t = document.createElement("div");
         t.className = "mc-record";
         t.textContent = W.records.labelInfinity + bestLevel;
