@@ -580,7 +580,7 @@ const AudioFX = (() => {
   // 168 BPM = 0.357 s/noire — tempo funky groove
   const BEAT_8BIT = 0.357;
   const ARTICULATION = 0.55;
-  const LOOP_PAUSE_BEATS = 1;
+  const LOOP_PAUSE_BEATS = 0; // inclus dans le couplet (premier silence)
   // Swing shuffle 2:1 : croche longue = 2/3 de noire
   const SWING = 2 / 3;
 
@@ -598,9 +598,35 @@ const AudioFX = (() => {
     { f: 440.00, len: 0.5 }, // A4
     { f: 587.33, len: 0.5 }, // D5
     { f: 392.00, len: 1   }, // G4
+    { f: 493.88, len: 1   }, // B4
+    { f: 392.00, len: 1.5 }, // G4
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 440.00, len: 0.5 }, // A4
+    { f: 587.33, len: 0.5 }, // D5
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 392.00, len: 0.5 }, // G4
+    { f: 493.88, len: 1   }, // B4
+    { f: 392.00, len: 1.5 }, // G4
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 440.00, len: 0.5 }, // A4
+    { f: 587.33, len: 0.5 }, // D5
+    { f: 392.00, len: 1   }, // G4
   ];
 
   const HARMONY_8BIT = [
+    { f: 622.25, len: 1   }, // Eb5
+    { f: 493.88, len: 1.5 }, // B4
+    { f: 622.25, len: 0.5 }, // Eb5
+    { f: 554.37, len: 0.5 }, // C#5
+    { f: 739.99, len: 0.5 }, // F#5
+    { f: 622.25, len: 0.5 }, // Eb5
+    { f: 493.88, len: 0.5 }, // B4
+    { f: 622.25, len: 1   }, // Eb5
+    { f: 493.88, len: 1.5 }, // B4
+    { f: 622.25, len: 0.5 }, // Eb5
+    { f: 554.37, len: 0.5 }, // C#5
+    { f: 739.99, len: 0.5 }, // F#5
+    { f: 493.88, len: 1   }, // B4
     { f: 622.25, len: 1   }, // Eb5
     { f: 493.88, len: 1.5 }, // B4
     { f: 622.25, len: 0.5 }, // Eb5
@@ -636,6 +662,108 @@ const AudioFX = (() => {
     { f: 293.66, start: 8.67, len: 0.28 }, // D4
     { f: 196.00, start: 9,    len: 0.55 }, // G3
     { f: 246.94, start: 9.67, len: 0.22 }, // B3 — turnaround avant rebouclage
+  ];
+
+  // ── COUPLET ─────────────────────────────────────────────────────────────────
+  // f: 0 = silence. Total: 20 beats (1 + 16 de notes + 3 de silence final)
+  // Gamme FR→EN : si=B, do=C, ré=D, mi=E, fa=F, sol=G, la=A
+  const VERSE_8BIT = [
+    { f: 0,      len: 1   }, // silence (= LOOP_PAUSE_BEATS du refrain)
+    { f: 246.94, len: 0.5 }, // B3
+    { f: 246.94, len: 0.5 }, // B3
+    { f: 246.94, len: 0.5 }, // B3
+    { f: 261.63, len: 0.5 }, // C4
+    { f: 293.66, len: 0.5 }, // D4
+    { f: 246.94, len: 0.5 }, // B3
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 293.66, len: 0.5 }, // D4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 349.23, len: 0.5 }, // F4
+    { f: 246.94, len: 0.5 }, // B3
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 349.23, len: 0.5 }, // F4
+    { f: 392.00, len: 1   }, // G4
+    { f: 349.23, len: 0.5 }, // F4
+    { f: 392.00, len: 0.5 }, // G4
+    { f: 440.00, len: 0.5 }, // A4
+    { f: 349.23, len: 0.5 }, // F4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 392.00, len: 0.5 }, // G4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 261.63, len: 0.5 }, // C4
+    { f: 293.66, len: 0.5 }, // D4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 246.94, len: 0.5 }, // B3
+    { f: 349.23, len: 2   }, // F4
+    { f: 0,      len: 2   }, // silence final
+  ];
+
+  // Tierce au-dessus de chaque note du couplet
+  const VERSE_HARMONY_8BIT = [
+    { f: 0,      len: 1   },
+    { f: 293.66, len: 0.5 }, // D4  (over B3)
+    { f: 293.66, len: 0.5 },
+    { f: 293.66, len: 0.5 },
+    { f: 329.63, len: 0.5 }, // E4  (over C4)
+    { f: 349.23, len: 0.5 }, // F4  (over D4)
+    { f: 293.66, len: 0.5 }, // D4  (over B3)
+    { f: 392.00, len: 0.5 }, // G4  (over E4)
+    { f: 392.00, len: 0.5 },
+    { f: 349.23, len: 0.5 }, // F4  (over D4)
+    { f: 392.00, len: 0.5 }, // G4  (over E4)
+    { f: 440.00, len: 0.5 }, // A4  (over F4)
+    { f: 293.66, len: 0.5 }, // D4  (over B3)
+    { f: 392.00, len: 0.5 }, // G4  (over E4)
+    { f: 440.00, len: 0.5 }, // A4  (over F4)
+    { f: 493.88, len: 1   }, // B4  (over G4)
+    { f: 440.00, len: 0.5 }, // A4  (over F4)
+    { f: 493.88, len: 0.5 }, // B4  (over G4)
+    { f: 523.25, len: 0.5 }, // C5  (over A4)
+    { f: 440.00, len: 0.5 }, // A4  (over F4)
+    { f: 392.00, len: 0.5 }, // G4  (over E4)
+    { f: 392.00, len: 0.5 },
+    { f: 493.88, len: 0.5 }, // B4  (over G4)
+    { f: 392.00, len: 0.5 }, // G4  (over E4)
+    { f: 392.00, len: 0.5 },
+    { f: 392.00, len: 0.5 },
+    { f: 329.63, len: 0.5 }, // E4  (over C4)
+    { f: 349.23, len: 0.5 }, // F4  (over D4)
+    { f: 392.00, len: 0.5 }, // G4  (over E4)
+    { f: 293.66, len: 0.5 }, // D4  (over B3)
+    { f: 440.00, len: 2   }, // A4  (over F4)
+    { f: 0,      len: 2   }, // silence final
+  ];
+
+  // Basse couplet — 1 octave sous la mélodie, start = beats relatifs début couplet
+  const VERSE_BASS_8BIT = [
+    { f: 123.47, start: 1,    len: 0.30 }, // B2
+    { f: 123.47, start: 2,    len: 0.28 }, // B2
+    { f: 130.81, start: 2.5,  len: 0.28 }, // C3
+    { f: 146.83, start: 3,    len: 0.28 }, // D3
+    { f: 123.47, start: 3.5,  len: 0.22 }, // B2
+    { f: 164.81, start: 4,    len: 0.55 }, // E3
+    { f: 146.83, start: 5,    len: 0.28 }, // D3
+    { f: 164.81, start: 5.5,  len: 0.28 }, // E3
+    { f: 174.61, start: 6,    len: 0.28 }, // F3
+    { f: 123.47, start: 6.5,  len: 0.22 }, // B2
+    { f: 164.81, start: 7,    len: 0.55 }, // E3
+    { f: 196.00, start: 8,    len: 0.80 }, // G3 (sous G4 tenu)
+    { f: 174.61, start: 9,    len: 0.28 }, // F3
+    { f: 196.00, start: 9.5,  len: 0.28 }, // G3
+    { f: 220.00, start: 10,   len: 0.28 }, // A3
+    { f: 174.61, start: 10.5, len: 0.22 }, // F3
+    { f: 164.81, start: 11,   len: 0.55 }, // E3
+    { f: 196.00, start: 12,   len: 0.28 }, // G3
+    { f: 164.81, start: 13,   len: 0.55 }, // E3
+    { f: 130.81, start: 14,   len: 0.28 }, // C3
+    { f: 146.83, start: 14.5, len: 0.22 }, // D3
+    { f: 164.81, start: 15,   len: 0.28 }, // E3
+    { f: 123.47, start: 15.5, len: 0.22 }, // B2
+    { f: 174.61, start: 16,   len: 0.80 }, // F3
   ];
 
   function _writeTriangle(data, pos, freq, sr, samples, volume, articulation) {
@@ -700,72 +828,97 @@ const AudioFX = (() => {
     }
   }
 
+  function _writeBassNote(data, startSample, freq, sr, lenSamples, totalSamples, vol) {
+    if (startSample + lenSamples > totalSamples) return;
+    const fadeLen = Math.min(256, Math.round(sr * 0.008));
+    const period  = sr / freq;
+    for (let i = 0; i < lenSamples; i++) {
+      const phase = (i % period) / period;
+      let env = 1;
+      if (i < fadeLen) env = i / fadeLen;
+      else if (i >= lenSamples - fadeLen) env = (lenSamples - 1 - i) / fadeLen;
+      data[startSample + i] += vol * Math.sin(2 * Math.PI * phase) * env;
+    }
+  }
+
   function _buildMelodyAudioBuffer(c) {
     const sr = c.sampleRate;
-    const melodyBeats  = MELODY_8BIT.reduce((s, n) => s + n.len, 0); // = 10
-    const totalBeats   = melodyBeats + LOOP_PAUSE_BEATS;
-    const totalSamples = Math.round(totalBeats * BEAT_8BIT * sr);
+    const melodyBeats      = MELODY_8BIT.reduce((s, n) => s + n.len, 0); // 10
+    const verseBeats       = VERSE_8BIT.reduce((s, n) => s + n.len, 0);  // 20
+    const totalSamples     = Math.round((melodyBeats + verseBeats) * BEAT_8BIT * sr);
+    const verseStartSample = Math.round(melodyBeats * BEAT_8BIT * sr);
 
     const audioBuf = c.createBuffer(1, totalSamples, sr);
     const data = audioBuf.getChannelData(0);
 
-    // --- Mélodie ---
+    // ── REFRAIN ────────────────────────────────────────────────────────────────
     let pos = 0;
     for (const note of MELODY_8BIT) {
-      const slotSamples = Math.round(note.len * BEAT_8BIT * sr);
-      _writeTriangle(data, pos, note.f, sr, slotSamples, 0.12, ARTICULATION);
-      pos += slotSamples;
+      const s = Math.round(note.len * BEAT_8BIT * sr);
+      _writeTriangle(data, pos, note.f, sr, s, 0.12, ARTICULATION);
+      pos += s;
     }
-
-    // --- Harmonie ---
     pos = 0;
     for (const note of HARMONY_8BIT) {
-      const slotSamples = Math.round(note.len * BEAT_8BIT * sr);
-      _writeTriangle(data, pos, note.f, sr, slotSamples, 0.055, ARTICULATION);
-      pos += slotSamples;
+      const s = Math.round(note.len * BEAT_8BIT * sr);
+      _writeTriangle(data, pos, note.f, sr, s, 0.055, ARTICULATION);
+      pos += s;
     }
-
-    // --- Basse (sine) ---
     for (const bn of BASS_8BIT) {
-      const bStart   = Math.round(bn.start * BEAT_8BIT * sr);
-      const bSamples = Math.round(bn.len   * BEAT_8BIT * sr);
-      if (bStart + bSamples > totalSamples) continue;
-      const fadeLen = Math.min(256, Math.round(sr * 0.008));
-      const period  = sr / bn.f;
-      for (let i = 0; i < bSamples; i++) {
-        const phase = (i % period) / period;
-        let env = 1;
-        if (i < fadeLen) env = i / fadeLen;
-        else if (i >= bSamples - fadeLen) env = (bSamples - 1 - i) / fadeLen;
-        data[bStart + i] += 0.09 * Math.sin(2 * Math.PI * phase) * env;
-      }
+      _writeBassNote(data, Math.round(bn.start * BEAT_8BIT * sr),
+        bn.f, sr, Math.round(bn.len * BEAT_8BIT * sr), totalSamples, 0.09);
     }
-
-    // --- Percussions avec swing shuffle 2:1 ---
-    // Sur chaque noire : kick (pairs) ou snare (impairs) + hi-hat downbeat
-    // Sur chaque swung upbeat (SWING * BEAT) : hi-hat léger
-    const numBeats = Math.floor(melodyBeats); // 10
-    for (let b = 0; b < numBeats; b++) {
-      const downSample = Math.round(b * BEAT_8BIT * sr);
-      const upSample   = Math.round((b + SWING) * BEAT_8BIT * sr);
-      if (b % 2 === 0) _writeKick  (data, downSample, sr, totalSamples, 0.20);
-      else             _writeSnare (data, downSample, sr, totalSamples, 0.15);
-      _writeHihat(data, downSample, sr, totalSamples, 0.07);
-      _writeHihat(data, upSample,   sr, totalSamples, 0.04);
+    for (let b = 0; b < Math.floor(melodyBeats); b++) {
+      const ds = Math.round(b * BEAT_8BIT * sr);
+      const us = Math.round((b + SWING) * BEAT_8BIT * sr);
+      if (b % 2 === 0) _writeKick (data, ds, sr, totalSamples, 0.20);
+      else             _writeSnare(data, ds, sr, totalSamples, 0.15);
+      _writeHihat(data, ds, sr, totalSamples, 0.07);
+      _writeHihat(data, us, sr, totalSamples, 0.04);
     }
-
-    // --- Chord stabs sur les swung upbeats des kicks (beats 0,2,4,6,8) ---
-    // Effet "chicken scratch" — énergie syncopée juste avant le snare
     const stabChords = [
-      [493.88, 622.25], // B4+Eb5
-      [440.00, 554.37], // A4+C#5
-      [493.88, 587.33], // B4+D5
-      [392.00, 493.88], // G4+B4
-      [493.88, 622.25], // B4+Eb5
+      [493.88, 622.25], [440.00, 554.37], [493.88, 587.33],
+      [392.00, 493.88], [493.88, 622.25],
     ];
     [0, 2, 4, 6, 8].forEach((b, i) => {
       const sp = Math.round((b + SWING) * BEAT_8BIT * sr);
-      if (sp < totalSamples) _writeChordStab(data, sp, sr, totalSamples, stabChords[i], 0.07);
+      if (sp < verseStartSample) _writeChordStab(data, sp, sr, totalSamples, stabChords[i], 0.07);
+    });
+
+    // ── COUPLET ────────────────────────────────────────────────────────────────
+    pos = verseStartSample;
+    for (const note of VERSE_8BIT) {
+      const s = Math.round(note.len * BEAT_8BIT * sr);
+      if (note.f > 0) _writeTriangle(data, pos, note.f, sr, s, 0.11, ARTICULATION);
+      pos += s;
+    }
+    pos = verseStartSample;
+    for (const note of VERSE_HARMONY_8BIT) {
+      const s = Math.round(note.len * BEAT_8BIT * sr);
+      if (note.f > 0) _writeTriangle(data, pos, note.f, sr, s, 0.05, ARTICULATION);
+      pos += s;
+    }
+    for (const bn of VERSE_BASS_8BIT) {
+      _writeBassNote(data, verseStartSample + Math.round(bn.start * BEAT_8BIT * sr),
+        bn.f, sr, Math.round(bn.len * BEAT_8BIT * sr), totalSamples, 0.09);
+    }
+    // Percussion couplet : beat 0 du couplet = silence, on démarre à b=1
+    for (let b = 1; b <= 16; b++) {
+      const ds = verseStartSample + Math.round(b * BEAT_8BIT * sr);
+      const us = verseStartSample + Math.round((b + SWING) * BEAT_8BIT * sr);
+      if (b % 2 === 1) _writeKick (data, ds, sr, totalSamples, 0.18);
+      else             _writeSnare(data, ds, sr, totalSamples, 0.13);
+      _writeHihat(data, ds, sr, totalSamples, 0.06);
+      _writeHihat(data, us, sr, totalSamples, 0.035);
+    }
+    const verseStabs = [
+      [329.63, 392.00], // E4+G4 (beat 4 du couplet)
+      [392.00, 493.88], // G4+B4 (beat 8, sur le sol4 tenu)
+      [329.63, 440.00], // E4+A4 (beat 12)
+    ];
+    [4, 8, 12].forEach((b, i) => {
+      const sp = verseStartSample + Math.round((b + SWING) * BEAT_8BIT * sr);
+      if (sp < totalSamples) _writeChordStab(data, sp, sr, totalSamples, verseStabs[i], 0.06);
     });
 
     return audioBuf;
