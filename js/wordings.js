@@ -53,12 +53,14 @@ window.WORDINGS = {
     leadHtml: "Comme Œugénie, trouve le <strong>🍮</strong> dans la foule.",
     modeTitle: "Choisis ton mode",
   },
+  invite: {
+    title: "LE FLAN PÂTISSIER",
+    metaHtml: "<strong>Tous les jours à 15 h 30</strong><br>Théâtre Tremplin, Avignon",
+  },
   win: {
     title: "Bravo !",
     subtitle: "Tu as trouvé le flan.",
     inviteLine1: "Tu as gagné le droit de voir",
-    inviteTitle: "LE FLAN PÂTISSIER",
-    inviteMetaHtml: "<strong>Tous les jours à 15 h 30</strong><br>Théâtre Tremplin, Avignon",
     inviteHintHtml: "Place <strong>payante</strong>, comme tout le monde. On n'a pas les moyens, désolé.<br>Mais on est très contents que tu viennes.",
     modeTitle: "Rejouer",
     newRecord: "✨ Nouveau record !",
@@ -68,8 +70,6 @@ window.WORDINGS = {
     title: "Loupé.",
     message: "Tu as raté le flan, mais le flan ne t'a pas raté.",
     inviteLine1: "Tu peux quand même venir voir",
-    inviteTitle: "LE FLAN PÂTISSIER",
-    inviteMetaHtml: "<strong>Tous les jours à 15 h 30</strong><br>Théâtre Tremplin, Avignon",
     inviteHintHtml: "Ca t'aidera peut-être à t'améliorer.",
     modeTitle: "Réessayer",
     trickyTitle: "Faux flan.",
@@ -105,6 +105,8 @@ window.WORDINGS = {
     defaultMessage: "L'infini ne pardonne pas.",
     levelReached: "Niveau atteint",
     newLevelRecord: "✨ Nouveau record de niveau !",
+    inviteLine1: "Tu as bien mérité de voir",
+    inviteHintHtml: "Ca te fera pas de mal de sortir un peu.",
   },
   bubbles: [
     "Hé !", "Là-bas !", "Non, ici", "Trop tard", "COT COT", "Pas moi",
@@ -213,8 +215,8 @@ function applyChasseWordings() {
   setText("win-title", w.win.title);
   setText("win-subtitle", w.win.subtitle);
   setText("win-invite-line1", w.win.inviteLine1);
-  setText("win-invite-title", w.win.inviteTitle);
-  setHtml("win-invite-meta", w.win.inviteMetaHtml);
+  setText("win-invite-title", w.invite.title);
+  setHtml("win-invite-meta", w.invite.metaHtml);
   setHtml("win-invite-hint", w.win.inviteHintHtml);
   setText("win-mode-title", w.win.modeTitle);
   setText("mode-win-beginner-label", w.modes.beginner.label);
@@ -225,8 +227,8 @@ function applyChasseWordings() {
   setText("lose-title", w.lose.title);
   setText("lose-message", w.lose.message);
   setText("lose-invite-line1", w.lose.inviteLine1);
-  setText("lose-invite-title", w.lose.inviteTitle);
-  setHtml("lose-invite-meta", w.lose.inviteMetaHtml);
+  setText("lose-invite-title", w.invite.title);
+  setHtml("lose-invite-meta", w.invite.metaHtml);
   setHtml("lose-invite-hint", w.lose.inviteHintHtml);
   setText("lose-mode-title", w.lose.modeTitle);
   setText("mode-lose-beginner-label", w.modes.beginner.label);

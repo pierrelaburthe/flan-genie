@@ -1229,12 +1229,20 @@ function loseGame(reason, clickedEmoji) {
     }
     // L'écran de défaite arrive après la musique complète (~4.5s)
     setTimeout(() => {
+      const line1El = document.getElementById("lose-invite-line1");
+      if (line1El) line1El.textContent = W.lose.inviteLine1;
+      const hintEl = document.getElementById("lose-invite-hint");
+      if (hintEl) hintEl.innerHTML = W.lose.inviteHintHtml;
       showScreen("lose");
     }, 4500);
   }
 }
 
 function injectInfinityLoseStats(screenEl, isNewRecord, level) {
+  const line1El = document.getElementById("lose-invite-line1");
+  if (line1El) line1El.textContent = W.infinity.inviteLine1;
+  const hintEl = document.getElementById("lose-invite-hint");
+  if (hintEl) hintEl.innerHTML = W.infinity.inviteHintHtml;
   let stats = screenEl.querySelector(".victory-stats");
   if (stats) stats.remove();
   stats = document.createElement("div");
