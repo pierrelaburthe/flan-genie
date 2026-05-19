@@ -26,7 +26,7 @@ const TRAPS_HARD = ["🍯", "🥮", "🍩", "🎂", "🧁", "🍰"];
 
 // Multiplicateurs partagés hardcore / infinity (même difficulté de base)
 const HARDCORE_MULTS = {
-  timeMult: 0.78,
+  timeMult: 0.75,
   chickenMult: 0.65,
   featherMult: 0.65,
   eggMult: 0.65,
@@ -43,7 +43,7 @@ const MODES = {
   beginner: {
     label: W.modes.beginner.label,
     sub: W.modes.beginner.sub,
-    timeMult: 1.7,
+    timeMult: 1.2,
     chickenMult: 1.8,
     featherMult: 1.8,
     eggMult: 1.8,
@@ -329,6 +329,7 @@ const state = {
   ambientMuted: false,
   sfxMuted: false,
   mode: "beginner",
+  cellSize: 70, // taille réelle d'une cellule (px), mise à jour dans buildGrid
 };
 
 // Historique pour éviter que le flan reste au même endroit (3 dernières positions)
@@ -407,6 +408,7 @@ function buildGrid(r) {
     const h = gridEl.clientHeight;
     if (w > 0 && h > 0) {
       const cellSize = Math.min(w / cols, h / rows);
+      state.cellSize = cellSize;
       const fontSize = Math.max(14, Math.floor(cellSize * 0.78));
       gridEl.style.setProperty("--cell-font", fontSize + "px");
     }
@@ -724,7 +726,7 @@ function spawnBubble() {
   b.textContent = BUBBLES[Math.floor(Math.random() * BUBBLES.length)];
   b.style.left = (8 + Math.random() * 78) + "vw";
   b.style.top = (12 + Math.random() * 65) + "vh";
-  b.style.fontSize = (15 + Math.random() * 14) + "px";
+  b.style.fontSize = Math.round((15 + Math.random() * 14) * getOverlayScale()) + "px";
   b.style.setProperty("--tilt", (Math.random() * 30 - 15) + "deg");
   document.body.appendChild(b);
   setTimeout(() => b.remove(), 700);
@@ -772,7 +774,8 @@ function spawnFeather(opts) {
   else f.className = "wildlife head straight";
   f.style.left = (opts.x != null ? opts.x : Math.random() * 95) + "vw";
   if (opts.startY != null) f.style.top = opts.startY + "vh";
-  f.style.fontSize = (opts.size || (50 + Math.random() * 50)) + "px";
+  const baseSize = opts.size != null ? opts.size : (50 + Math.random() * 50);
+  f.style.fontSize = Math.round(baseSize * getOverlayScale()) + "px";
   f.style.setProperty("--rot-start", (Math.random() * 80 - 40) + "deg");
   f.style.setProperty("--rot-end", (Math.random() * 1440 + 360) + "deg");
   f.style.setProperty("--drift", ((Math.random() - 0.5) * 280) + "px");
@@ -794,9 +797,16 @@ function spawnFeatherExplosion() {
   AudioFX.thud(0.06);
 }
 
+// Retourne un facteur d'échelle ≤ 1 pour réduire les overlays sur mobile
+// (70px = taille de référence d'une cellule sur desktop)
+function getOverlayScale() {
+  return Math.min(1.0, state.cellSize / 70);
+}
+
 function getChickenSize() {
   const r = ROUNDS[state.round];
-  return (r && r.chickenSize) ? r.chickenSize : 110;
+  const base = (r && r.chickenSize) ? r.chickenSize : 110;
+  return Math.round(base * getOverlayScale());
 }
 
 // SVG d'une poule en pied avec pattes animées (basse-cour)
