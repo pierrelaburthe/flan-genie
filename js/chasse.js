@@ -171,6 +171,15 @@ let ROUNDS = ROUNDS_BASE; // recalculé via applyMode()
 // Sauvegarde de progression + médailles
 // ============================================================
 const SAVE_KEY = W.storage.saveKey;
+const AUDIO_PREFS_KEY = SAVE_KEY + "-audio";
+
+function loadAudioPrefs() {
+  try { return JSON.parse(localStorage.getItem(AUDIO_PREFS_KEY) || "{}"); }
+  catch { return {}; }
+}
+function saveAudioPrefs(prefs) {
+  try { localStorage.setItem(AUDIO_PREFS_KEY, JSON.stringify(prefs)); } catch {}
+}
 
 function loadProgress() {
   try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "{}"); }
@@ -322,8 +331,8 @@ const state = {
   mode: "beginner",
 };
 
-// Historique pour éviter que le flan reste au même endroit
-const recentFlan = []; // { row, col }
+// Historique pour éviter que le flan reste au même endroit (3 dernières positions)
+const recentFlan = []; // positions récentes
 
 const gridEl = document.getElementById("ch-grid");
 const roundEl = document.getElementById("ch-round");
@@ -333,8 +342,6 @@ const overlayEl = document.getElementById("ch-overlay");
 const introEl = document.getElementById("ch-intro");
 const winEl = document.getElementById("ch-win");
 const loseEl = document.getElementById("ch-lose");
-// Boutons start/replay/retry remplacés par les .mode-card
-const codeEl = document.getElementById("ch-code");
 const loseEmoji = document.getElementById("ch-lose-emoji");
 const loseTitle = document.getElementById("ch-lose-title");
 const loseMsg = document.getElementById("ch-lose-msg");
@@ -352,13 +359,15 @@ function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 function pickFlanIdx(cols, rows) {
   const cells = cols * rows;
-  const lastPos = recentFlan.length > 0 ? recentFlan[recentFlan.length - 1].pos : -1;
+  const excluded = new Set(recentFlan);
   let pos;
+  let tries = 0;
   do {
     pos = Math.floor(Math.random() * cells);
-  } while (pos === lastPos);
-  recentFlan.length = 0;
-  recentFlan.push({ pos, row: Math.floor(pos / cols), col: pos % cols });
+    tries++;
+  } while (excluded.has(pos) && tries < 20);
+  recentFlan.push(pos);
+  if (recentFlan.length > 3) recentFlan.shift();
   return pos;
 }
 
@@ -422,7 +431,8 @@ function buildGrid(r) {
     }
     b.textContent = emoji;
     b.style.animationDelay = (Math.random() * 2).toFixed(2) + "s";
-    b.onclick = () => onCellClick(b, isFlan, isTricky);
+    // Read data-tricky at click time (not from closure) so swapped cells behave correctly
+    b.onclick = () => onCellClick(b, isFlan, b.dataset.tricky === "true");
     gridEl.appendChild(b);
   }
 }
@@ -1418,24 +1428,6 @@ function flanExplosion() {
   setTimeout(() => drip.remove(), D + 100);
 }
 
-function splatFlan() {
-  const s = document.createElement("div");
-  s.className = "splat-flan";
-  s.textContent = "🍮";
-  document.body.appendChild(s);
-  // Petite onde de choc autour
-  setTimeout(() => {
-    const wave = document.createElement("div");
-    wave.className = "splat-wave";
-    document.body.appendChild(wave);
-    setTimeout(() => wave.remove(), 800);
-  }, 800);
-  // Shake d'écran au moment de l'impact
-  setTimeout(() => document.body.classList.add("screen-shake"), 800);
-  setTimeout(() => document.body.classList.remove("screen-shake"), 1300);
-  setTimeout(() => s.remove(), 2200);
-}
-
 function showScreen(which) {
   introEl.hidden = which !== "intro";
   winEl.hidden = which !== "win";
@@ -1499,13 +1491,38 @@ if (modeBtn) {
 // Boutons audio : ambiance + bruitages
 const ambienceBtn = document.getElementById("ambience-toggle");
 const sfxBtn = document.getElementById("sfx-toggle");
+
+// Restore saved audio preferences
+(function applyAudioPrefs() {
+  const prefs = loadAudioPrefs();
+  if (prefs.ambientMuted) {
+    state.ambientMuted = true;
+    if (ambienceBtn) {
+      ambienceBtn.classList.add("muted");
+      ambienceBtn.querySelector(".audio-icon").textContent = "🔇";
+      ambienceBtn.setAttribute("aria-pressed", "true");
+    }
+  }
+  if (prefs.sfxMuted) {
+    state.sfxMuted = true;
+    AudioFX.setSfxMuted(true);
+    if (sfxBtn) {
+      sfxBtn.classList.add("muted");
+      sfxBtn.querySelector(".audio-icon").textContent = "🔇";
+      sfxBtn.setAttribute("aria-pressed", "true");
+    }
+  }
+})();
+
 if (ambienceBtn) {
   ambienceBtn.onclick = () => {
     state.ambientMuted = !state.ambientMuted;
     ambienceBtn.classList.toggle("muted", state.ambientMuted);
     ambienceBtn.querySelector(".audio-icon").textContent = state.ambientMuted ? "🔇" : "🎵";
+    ambienceBtn.setAttribute("aria-pressed", String(state.ambientMuted));
     if (state.ambientMuted) AudioFX.stopMusic();
     else if (state.playing || state.inTransition) AudioFX.startMusic();
+    saveAudioPrefs({ ambientMuted: state.ambientMuted, sfxMuted: state.sfxMuted });
   };
 }
 if (sfxBtn) {
@@ -1514,6 +1531,8 @@ if (sfxBtn) {
     AudioFX.setSfxMuted(state.sfxMuted);
     sfxBtn.classList.toggle("muted", state.sfxMuted);
     sfxBtn.querySelector(".audio-icon").textContent = state.sfxMuted ? "🔇" : "🐔";
+    sfxBtn.setAttribute("aria-pressed", String(state.sfxMuted));
+    saveAudioPrefs({ ambientMuted: state.ambientMuted, sfxMuted: state.sfxMuted });
   };
 }
 
