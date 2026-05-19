@@ -698,8 +698,12 @@ const AudioFX = (() => {
     { f: 293.66, len: 0.5 }, // D4
     { f: 329.63, len: 0.5 }, // E4
     { f: 246.94, len: 0.5 }, // B3
-    { f: 349.23, len: 2   }, // F4
-    { f: 0,      len: 2   }, // silence final
+    { f: 349.23, len: 1.5   }, // F4
+    { f: 0, len: 0.5 }, // silence
+    { f: 493.88, len: 0.5 }, // B4 — descente vers le refrain
+    { f: 392.00, len: 0.5 }, // G4
+    { f: 329.63, len: 0.5 }, // E4
+    { f: 246.94, len: 0.5 }, // B3
   ];
 
   // Tierce au-dessus de chaque note du couplet
@@ -734,8 +738,12 @@ const AudioFX = (() => {
     { f: 349.23, len: 0.5 }, // F4  (over D4)
     { f: 392.00, len: 0.5 }, // G4  (over E4)
     { f: 293.66, len: 0.5 }, // D4  (over B3)
-    { f: 440.00, len: 2   }, // A4  (over F4)
-    { f: 0,      len: 2   }, // silence final
+    { f: 440.00, len: 1.5   }, // A4  (over F4)
+    { f: 0, len: 0.5 }, // silence
+    { f: 587.33, len: 0.5 }, // D5  (over B4)
+    { f: 493.88, len: 0.5 }, // B4  (over G4)
+    { f: 392.00, len: 0.5 }, // G4  (over E4)
+    { f: 293.66, len: 0.5 }, // D4  (over B3)
   ];
 
   // Basse couplet — 1 octave sous la mélodie, start = beats relatifs début couplet
