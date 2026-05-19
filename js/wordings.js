@@ -61,7 +61,7 @@ window.WORDINGS = {
     title: "Bravo !",
     subtitle: "Tu as trouvé le flan.",
     inviteLine1: "Tu as gagné le droit de voir",
-    inviteHintHtml: "Place <strong>payante</strong>, comme tout le monde. On n'a pas les moyens, désolé.<br>Mais on est très contents que tu viennes.",
+    inviteHintHtml: "Place <strong>payante</strong>, comme tout le monde.<br>On n'a pas les moyens, désolé.<br>Mais on est très contents que tu viennes.",
     modeTitle: "Rejouer",
     newRecord: "✨ Nouveau record !",
     yourTime: "Ton temps",

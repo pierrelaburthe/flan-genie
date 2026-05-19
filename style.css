@@ -283,15 +283,16 @@ body {
 @media (max-width: 720px) {
   .ch-overlay {
     padding: 4px;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    overflow: hidden;
+    overflow-y: auto;
+    padding-bottom: 24px;
   }
   .ch-screen {
     padding: 8px 10px;
     max-height: calc(100dvh - 8px);
     max-height: calc(100vh - 8px);
-    overflow: hidden;
+    overflow-y: auto;
     box-shadow: 2px 2px 0 var(--rose);
     width: 100%;
     border-width: 2px;
